@@ -12,6 +12,7 @@ interface
 uses
   System.SysUtils,
   System.JSON,
+  System.Types,
   System.Generics.Collections,
   DelphiWebDriver.Interfaces,
   DelphiWebDriver.Types;
@@ -38,6 +39,9 @@ type
     procedure MinimizeWindow;
     procedure FullscreenWindow;
     procedure SetWindowSize(const Width, Height: Integer);
+    function GetWindowSize: TSize;
+    procedure SetWindowPosition(const X, Y: Integer);
+    function GetWindowPosition: TPoint;
   end;
 
 implementation
@@ -53,6 +57,20 @@ constructor TWebDriverContexts.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
+end;
+
+procedure TWebDriverContexts.SetWindowPosition(const X, Y: Integer);
+var
+  Body: TJSONObject;
+begin
+  Body := TJSONObject.Create;
+  try
+    Body.AddPair('x', X);
+    Body.AddPair('y', Y);
+    FDriver.Commands.SendCommand('POST', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', Body).Free;
+  finally
+    Body.Free;
+  end;
 end;
 
 procedure TWebDriverContexts.SetWindowSize(const Width, Height: Integer);
@@ -103,6 +121,40 @@ begin
     if Handles[I] = Current then
       Exit(I);
   Result := -1;
+end;
+
+function TWebDriverContexts.GetWindowPosition: TPoint;
+var
+  Resp: TJSONValue;
+  ValueObj: TJSONObject;
+begin
+  Resp := FDriver.Commands.SendCommand('GET', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', nil);
+  try
+    ValueObj := Resp.GetValue<TJSONObject>('value');
+      if not Assigned(ValueObj) then
+        raise EWebDriverError.Create('GetWindowPosition: no value returned');
+    Result.X := ValueObj.GetValue<Integer>('x');
+    Result.Y := ValueObj.GetValue<Integer>('y');
+  finally
+    Resp.Free;
+  end;
+end;
+
+function TWebDriverContexts.GetWindowSize: TSize;
+var
+  Resp: TJSONValue;
+  ValueObj: TJSONObject;
+begin
+  Resp := FDriver.Commands.SendCommand('GET', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', nil);
+  try
+    ValueObj := Resp.GetValue<TJSONObject>('value');
+      if not Assigned(ValueObj) then
+        raise EWebDriverError.Create('GetWindowSize: no value returned');
+    Result.cx := ValueObj.GetValue<Integer>('width');
+    Result.cy := ValueObj.GetValue<Integer>('height');
+  finally
+    Resp.Free;
+  end;
 end;
 
 function TWebDriverContexts.GetWindowHandle: string;
