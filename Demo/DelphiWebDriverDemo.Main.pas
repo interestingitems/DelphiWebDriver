@@ -105,7 +105,7 @@ begin
       Driver.Navigation.GoToURL('https://api.myip.com');
       Driver.Wait.UntilPageLoad;
 
-      LogsMemo.Text := Driver.Document.GetBodyElement.GetText;
+      LogsMemo.Text := Driver.Elements.GetBodyElement.GetText;
 
       ShowMessage('Msg Sent :)');
 

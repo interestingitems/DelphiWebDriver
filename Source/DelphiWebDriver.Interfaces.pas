@@ -77,7 +77,6 @@ type
     procedure ScrollToBottom;
     function PrintPdfPage: string;
     function SavePrintedPdfPage(const FileName: string): Boolean;
-    function GetBodyElement: IWebElement;
   end;
 
   IWebDriverCommands = interface
@@ -92,6 +91,7 @@ type
     function GetElementAttribute(By: TBy; const Attr: string): string;
     function ElementExists(By: TBy): Boolean;
     function ElementsExist(By: TBy): Boolean;
+    function GetBodyElement: IWebElement;
   end;
 
   IWebDriverContexts = interface

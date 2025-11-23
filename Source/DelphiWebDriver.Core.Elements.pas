@@ -28,6 +28,7 @@ type
     function GetElementAttribute(By: TBy; const Attr: string): string;
     function ElementExists(By: TBy): Boolean;
     function ElementsExist(By: TBy): Boolean;
+    function GetBodyElement: IWebElement;
   end;
 
 implementation
@@ -38,6 +39,11 @@ constructor TWebDriverElements.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
+end;
+
+function TWebDriverElements.GetBodyElement: IWebElement;
+begin
+  Result := FindElement(TBy.Css('body'));
 end;
 
 function TWebDriverElements.ElementExists(By: TBy): Boolean;
