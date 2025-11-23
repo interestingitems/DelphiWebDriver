@@ -16,8 +16,7 @@ uses
   System.Generics.Collections,
   System.Net.HttpClient,
   DelphiWebDriver.Interfaces,
-  DelphiWebDriver.Types,
-  DelphiWebDriver.Element;
+  DelphiWebDriver.Types;
 
 type
   TWebDriverCommands = class(TInterfacedObject, IWebDriverCommands)

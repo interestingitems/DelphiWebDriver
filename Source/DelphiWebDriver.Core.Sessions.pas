@@ -12,8 +12,7 @@ interface
 uses
   System.JSON,
   DelphiWebDriver.Interfaces,
-  DelphiWebDriver.Types,
-  System.SysUtils;
+  DelphiWebDriver.Types;
 
 type
   TWebDriverSessions = class(TInterfacedObject, IWebDriverSessions)

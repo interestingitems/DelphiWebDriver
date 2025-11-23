@@ -23,6 +23,7 @@ uses
   DelphiWebDriver.Core.Screenshot,
   DelphiWebDriver.Core.Alert,
   DelphiWebDriver.Core.Actions,
+  DelphiWebDriver.Core.Timeouts,
   DelphiWebDriver.Types;
 
 type
@@ -42,6 +43,7 @@ type
     FScreenshot : IWebDriverScreenshot;
     FAlert : IWebDriverAlert;
     FActions : IWebDriverActions;
+    FTimeouts: IWebDriverTimeouts;
   public
     constructor Create(BrowserConfig: TWebDriverBrowserConfig; const ABaseUrl: string); virtual;
     function Capabilities: IWebDriverCapabilities;
@@ -56,6 +58,7 @@ type
     function Screenshot : IWebDriverScreenshot;
     function Alert : IWebDriverAlert;
     function Actions : IWebDriverActions;
+    function Timeouts : IWebDriverTimeouts;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
 
@@ -122,6 +125,13 @@ begin
   if FSessions = nil then
     FSessions := TWebDriverSessions.Create(Self as IWebDriver);
   Result := FSessions;
+end;
+
+function TWebDriver.Timeouts: IWebDriverTimeouts;
+begin
+  if FTimeouts = nil then
+    FTimeouts := TWebDriverTimeouts.Create(Self as IWebDriver);
+  Result := FTimeouts;
 end;
 
 function TWebDriver.Navigation: IWebDriverNavigation;

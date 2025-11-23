@@ -16,6 +16,12 @@ uses
 type
   EWebDriverError = class(Exception);
 
+  TWebDriverTimeoutsConfig = record
+    Script: Integer;
+    PageLoad: Integer;
+    Implicit: Integer;
+  end;
+
   TWebDriverProxy = record
     Host: string;
     Port: Integer;

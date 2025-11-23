@@ -19,6 +19,12 @@ uses
 type
   IWebElement = interface;
 
+  IWebDriverTimeouts = interface
+    ['{5E3C1A9F-7B42-4D94-9A8F-0F8E1E2C3B77}']
+    function GetTimeouts: TWebDriverTimeoutsConfig;
+    procedure SetTimeouts(const Timeouts: TWebDriverTimeoutsConfig);
+  end;
+
   IWebDriverActions = interface
     ['{3F8C0F5A-2B4D-4E92-A8A9-9F4B6D8C3E21}']
     function MoveToElement(By: TBy; X: Integer = 0; Y: Integer = 0): IWebDriverActions;
@@ -187,6 +193,7 @@ type
     function Screenshot : IWebDriverScreenshot;
     function Alert : IWebDriverAlert;
     function Actions : IWebDriverActions;
+    function Timeouts : IWebDriverTimeouts;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
 
