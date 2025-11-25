@@ -180,6 +180,9 @@ type
     function FindElements(By: TBy): TArray<IWebElement>;
     property ElementId: string read GetElementId;
     procedure ScrollIntoView(BehaviorSmooth: Boolean = False);
+    procedure SelectByIndex(Index: Integer);
+    procedure SelectByValue(const Value: string);
+    procedure SelectByText(const Text: string);
   end;
 
   IWebDriver = interface

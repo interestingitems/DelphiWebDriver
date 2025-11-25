@@ -14,6 +14,7 @@ uses
   System.Types,
   System.Generics.Collections,
   System.StrUtils,
+  System.SysUtils,
   DelphiWebDriver.Interfaces,
   DelphiWebDriver.Types;
 
@@ -44,6 +45,9 @@ type
     function FindElement(By: TBy): IWebElement;
     function FindElements(By: TBy): TArray<IWebElement>;
     procedure ScrollIntoView(BehaviorSmooth: Boolean = False);
+    procedure SelectByIndex(Index: Integer);
+    procedure SelectByValue(const Value: string);
+    procedure SelectByText(const Text: string);
   end;
 
 implementation
@@ -129,6 +133,46 @@ begin
   finally
     Body.Free;
   end;
+end;
+
+procedure TWebElement.SelectByIndex(Index: Integer);
+var
+  Options: TArray<IWebElement>;
+begin
+  Options := FindElements(TBy.TagName('option'));
+  if (Index < 0) or (Index >= Length(Options)) then
+    raise EWebDriverError.CreateFmt('SelectByIndex: index %d out of bounds', [Index]);
+  Options[Index].Click;
+end;
+
+procedure TWebElement.SelectByText(const Text: string);
+var
+  Options: TArray<IWebElement>;
+  Opt: IWebElement;
+begin
+  Options := FindElements(TBy.TagName('option'));
+  for Opt in Options do
+    if Trim(Opt.GetText) = Trim(Text) then
+    begin
+      Opt.Click;
+      Exit;
+    end;
+  raise EWebDriverError.CreateFmt('SelectByText: no option with text "%s"', [Text]);
+end;
+
+procedure TWebElement.SelectByValue(const Value: string);
+var
+  Options: TArray<IWebElement>;
+  Opt: IWebElement;
+begin
+  Options := FindElements(TBy.TagName('option'));
+  for Opt in Options do
+    if Opt.GetAttribute('value') = Value then
+    begin
+      Opt.Click;
+      Exit;
+    end;
+  raise EWebDriverError.CreateFmt('SelectByValue: no option value="%s"', [Value]);
 end;
 
 procedure TWebElement.SendKeys(const Text: string);
@@ -362,8 +406,8 @@ end;
 function TWebElement.FindElement(By: TBy): IWebElement;
 var
   Body: TJSONObject;
-  Json: TJSONValue;
-  ElemObj: TJSONObject;
+  LRes: TJSONValue;
+  ValObj: TJSONObject;
   ElemId: string;
 begin
   Body := TJSONObject.Create;
@@ -371,24 +415,34 @@ begin
     Body.AddPair('using', By.Strategy);
     Body.AddPair('value', By.Value);
 
-    Json := FDriver.Commands.SendCommand('POST',
-      '/session/' + FDriver.Sessions.GetSessionId +
-      '/element/' + FElementId + '/element',
+    LRes := FDriver.Commands.SendCommand(
+      'POST',
+      '/session/' + FDriver.Sessions.GetSessionId + '/element',
       Body
     );
+
     try
-      ElemObj := Json.GetValue<TJSONObject>('value');
-      if not Assigned(ElemObj) then
-        raise EWebDriverError.Create('No element object returned');
+      if LRes.TryGetValue<TJSONObject>('value', ValObj) then
+      begin
+        if ValObj.TryGetValue<string>(
+            'element-6066-11e4-a52e-4f735466cecf', ElemId) then
+          Exit(TWebElement.Create(FDriver, ElemId));
 
-      if not ElemObj.TryGetValue<string>(
-        'element-6066-11e4-a52e-4f735466cecf', ElemId) then
-        ElemId := ElemObj.GetValue<string>('ELEMENT');
+        if ValObj.TryGetValue<string>('ELEMENT', ElemId) then
+          Exit(TWebElement.Create(FDriver, ElemId));
+      end;
 
-      Result := TWebElement.Create(FDriver, ElemId);
+      if LRes.TryGetValue<string>('element-6066-11e4-a52e-4f735466cecf', ElemId) then
+        Exit(TWebElement.Create(FDriver, ElemId));
+
+      if LRes.TryGetValue<string>('ELEMENT', ElemId) then
+        Exit(TWebElement.Create(FDriver, ElemId));
+
+      raise EWebDriverError.Create('Cannot extract element ID: ' + LRes.ToString);
     finally
-      Json.Free;
+      LRes.Free;
     end;
+
   finally
     Body.Free;
   end;
@@ -397,38 +451,45 @@ end;
 function TWebElement.FindElements(By: TBy): TArray<IWebElement>;
 var
   Body: TJSONObject;
-  Json, ArrItem: TJSONValue;
-  ElementsArray: TJSONArray;
-  I: Integer;
-  ElementId: string;
+  LRes: TJSONValue;
+  Arr: TJSONArray;
+  Item: TJSONValue;
+  ElemObj: TJSONObject;
+  ElemId: string;
+  List: TList<IWebElement>;
 begin
   Body := TJSONObject.Create;
+  List := TList<IWebElement>.Create;
   try
     Body.AddPair('using', By.Strategy);
     Body.AddPair('value', By.Value);
-
-    Json := FDriver.Commands.SendCommand(
+    LRes := FDriver.Commands.SendCommand(
       'POST',
-      '/session/' + FDriver.Sessions.GetSessionId +
-      '/element/' + FElementId + '/elements',
+      '/session/' + FDriver.Sessions.GetSessionId + '/elements',
       Body
     );
     try
-      ElementsArray := Json.GetValue<TJSONArray>('value');
-      SetLength(Result, ElementsArray.Count);
-      for I := 0 to ElementsArray.Count - 1 do
+      Arr := LRes.GetValue<TJSONArray>('value');
+      if (Arr = nil) or (Arr.Count = 0) then
       begin
-        ArrItem := ElementsArray.Items[I];
-        if not (ArrItem as TJSONObject).TryGetValue<string>(
-          'element-6066-11e4-a52e-4f735466cecf', ElementId) then
-          ElementId := (ArrItem as TJSONObject).GetValue<string>('ELEMENT');
-        Result[I] := TWebElement.Create(FDriver, ElementId);
+        Result := [];
+        Exit;
       end;
+      for Item in Arr do
+      begin
+        ElemObj := Item as TJSONObject;
+        if not ElemObj.TryGetValue<string>(
+            'element-6066-11e4-a52e-4f735466cecf', ElemId) then
+          ElemId := ElemObj.GetValue<string>('ELEMENT');
+        List.Add(TWebElement.Create(FDriver, ElemId));
+      end;
+      Result := List.ToArray;
     finally
-      Json.Free;
+      LRes.Free;
     end;
   finally
     Body.Free;
+    List.Free;
   end;
 end;
 
