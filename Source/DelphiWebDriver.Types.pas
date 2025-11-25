@@ -171,13 +171,20 @@ end;
 { TWebDriverBrowserHelper }
 
 function TWebDriverBrowserHelper.DriverName: String;
+{$IFDEF MSWINDOWS}
+const
+  EXT = '.exe';
+{$ELSE}
+const
+  EXT = '';
+{$ENDIF}
 begin
   case Self of
-    wdbChrome  : Result := 'chromedriver.exe';
-    wdbFirefox : Result := 'geckodriver.exe';
-    wdbEdge    : Result := 'msedgedriver.exe';
-    wdbOpera   : Result := 'operadriver.exe';
-    wdbBrave   : Result := 'chromedriver.exe';
+    wdbChrome  : Result := 'chromedriver'   + EXT;
+    wdbFirefox : Result := 'geckodriver'    + EXT;
+    wdbEdge    : Result := 'msedgedriver'   + EXT;
+    wdbOpera   : Result := 'operadriver'    + EXT;
+    wdbBrave   : Result := 'chromedriver'   + EXT;
   end;
 end;
 
