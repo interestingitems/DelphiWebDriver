@@ -88,12 +88,14 @@ var
   ExtensionDir, ManifestPath, BgPath: string;
   ManifestText, BgText: string;
 begin
-  ExtensionDir := ExtractFilePath(ParamStr(0)) + 'DelphiWebDriverProxyExtension\';
+  ExtensionDir := TPath.Combine(ExtractFilePath(ParamStr(0)), 'DelphiWebDriverProxyExtension');
+  ExtensionDir := IncludeTrailingPathDelimiter(ExtensionDir);
+
   if not TDirectory.Exists(ExtensionDir) then
     TDirectory.CreateDirectory(ExtensionDir);
 
-  ManifestPath := ExtensionDir + 'manifest.json';
-  BgPath := ExtensionDir + 'background.js';
+  ManifestPath := TPath.Combine(ExtensionDir, 'manifest.json');
+  BgPath := TPath.Combine(ExtensionDir, 'background.js');
 
   // MV2
   ManifestText :=
