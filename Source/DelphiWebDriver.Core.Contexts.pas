@@ -248,7 +248,7 @@ begin
   JSON := TJSONObject.Create;
   try
     JSON.AddPair('id', TJSONNull.Create);
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON);
+    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;
   finally
     JSON.Free;
   end;
@@ -261,7 +261,7 @@ begin
   JSON := TJSONObject.Create;
   try
     JSON.AddPair('id', TJSONString.Create(FrameName));
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON);
+    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;
   finally
     JSON.Free;
   end;
@@ -275,7 +275,7 @@ begin
   try
     JSON.AddPair('id', TJSONObject.Create.AddPair('ELEMENT', Element.ElementId)
       .AddPair('element-6066-11e4-a52e-4f735466cecf', Element.ElementId));
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON);
+    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;;
   finally
     JSON.Free;
   end;
