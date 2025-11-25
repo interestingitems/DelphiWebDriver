@@ -3,107 +3,48 @@
 ![Linux](https://img.shields.io/badge/OS-Linux-yellow?logo=linux)
 ![macOS](https://img.shields.io/badge/OS-macOS-black?logo=apple)
 
+![Windows](https://img.shields.io/badge/OS-Windows-blue?logo=windows)
+![Linux](https://img.shields.io/badge/OS-Linux-yellow?logo=linux)
+![macOS](https://img.shields.io/badge/OS-macOS-black?logo=apple)
+
 # DelphiWebDriver
 
-A Modern and Lightweight **W3C WebDriver Client for Delphi**, written from scratch and fully cross-platform.
-This project provides a pure Delphi implementation of the official **W3C WebDriver protocol**, allowing you to automate browsers without Selenium, external dependencies, or .NET bindings.
-
----
-
-## 🚀 Features
-
-### ✔ Cross-Platform
-- Windows  
-- Linux  
-- macOS  
-
-### ✔ Browser Support
-- **Chrome**
-- **Edge**
-- **Firefox**
-- **Opera**
-- **Brave**
-- **Proxy Support (Authentication Not Requuired) For [Edge, Opera, Brave]**
-- **Proxy Support (Authentication Requuired) For [Chrome, FireFox]**
-
-### ✔ Implemented WebDriver Functionality
-- **Sessions**
-  - Start / Quit
-  - Session ID handling
-
-- **Navigation**
-  - `ToURL`, Back, Forward, Refresh
-  - Get URL, Get Title
-
-- **Elements API**
-  - FindElement / FindElements
-  - ElementExists
-  - Click, SendKeys, Clear, GetText, GetAttribute, etc.
-
-- **Screenshots**
-  - Full page screenshot
-  - Element screenshot
-
-- **JavaScript Execution**
-  - ExecuteScript (sync)
-  - ExecuteAsyncScript
-
-- **Actions (W3C Actions API)**
-  - Mouse move, click, double-click, right-click
-  - Click & hold, release
-  - Keyboard typing (keyDown / keyUp)
-
-- **Alerts**
-  - Accept, Dismiss, GetText, SendKeys
-
-- **Wait API**
-  - Wait for element
-  - Wait for elements
-  - Wait for element disappearance
-  - Wait for page load
-  - Wait for URL / Title conditions
-
-- **Page Source**
-  - GetPageSource
-
-- **Command Layer**
-  - Full low-level command transport
-  - JSON request/response handling
-
-- **Capabilities**
-  - Generate W3C capabilities JSON
-  - Custom arguments and preferences
-  - Headless mode
-
-and much more...
+A **modern and lightweight W3C WebDriver client for Delphi**, written from scratch and fully cross-platform.
+DelphiWebDriver provides a pure Delphi implementation of the official **W3C WebDriver protocol**, allowing you to automate browsers without Selenium, external dependencies, or .NET bindings.
 
 ---
 
 ## 📦 Installation
 
-Just include the `DelphiWebDriver` folder in your project.  
+Simply include the `DelphiWebDriver` folder in your Delphi project.
 No external libraries required.
+
+---
+
+## 📖 Tutorial
+
+Learn how to get started with DelphiWebDriver in this detailed article:
+
+[DelphiWebDriver: The Most Powerful Delphi Library for Browser Automation](https://medium.com/@DA213/delphiwebdriver-the-most-powerful-delphi-library-for-browser-automation-b217e9106acc?postPublishedType=initial)
+
+More tutorials and guides will be added here soon.
 
 ---
 
 ## 💬 Support the Project
 
-If you find this project useful, consider supporting development ❤️
+If you find DelphiWebDriver useful, consider supporting its development ❤️
 
-**PayPal:**  
+**PayPal:**
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/ncp/payment/Q4KSUE7D7SU9N)
 
 ---
 
-## 📄 License
+### 🔹 Why DelphiWebDriver?
 
-MIT License.  
-Free to use in personal and commercial applications.
-
----
-
-## 📬 Author
-
-**Abderrahmane**  
-GitHub: https://github.com/DA213/DelphiWebDriver
+* Fully cross-platform: Windows, Linux, macOS
+* Pure Delphi implementation: no external dependencies
+* Automates all major browsers: Chrome, Firefox, Edge, Opera, Brave
+* Low-level command access & high-level convenience API
+* Lightweight, modern, and easy to integrate
