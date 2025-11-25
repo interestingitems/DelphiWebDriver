@@ -72,6 +72,8 @@ type
     class function TagName(const AValue: string): TBy; static;
     class function LinkText(const AValue: string): TBy; static;
     class function PartialLinkText(const AValue: string): TBy; static;
+    class function Attribute(const Attr, Value: string): TBy; static;
+    class function FormByAction(const AValue: string): TBy; static;
     function ToJson: TJSONObject;
   end;
 
@@ -152,6 +154,18 @@ class function TBy.PartialLinkText(const AValue: string): TBy;
 begin
   Result.Strategy := 'partial link text';
   Result.Value    := AValue;
+end;
+
+class function TBy.Attribute(const Attr, Value: string): TBy;
+begin
+  Result.Strategy := 'xpath';
+  Result.Value := '//*[@' + Attr + '="' + Value + '"]';
+end;
+
+class function TBy.FormByAction(const AValue: string): TBy;
+begin
+  Result.Strategy := 'css selector';
+  Result.Value := 'form[action="' + AValue + '"]';
 end;
 
 { TWebDriverBrowserHelper }
