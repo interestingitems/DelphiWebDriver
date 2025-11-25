@@ -1,8 +1,3 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/DA213/DelphiWebDriver/blob/main/License.txt)
-![Windows](https://img.shields.io/badge/OS-Windows-blue?logo=windows)
-![Linux](https://img.shields.io/badge/OS-Linux-yellow?logo=linux)
-![macOS](https://img.shields.io/badge/OS-macOS-black?logo=apple)
-
 ![Windows](https://img.shields.io/badge/OS-Windows-blue?logo=windows)
 ![Linux](https://img.shields.io/badge/OS-Linux-yellow?logo=linux)
 ![macOS](https://img.shields.io/badge/OS-macOS-black?logo=apple)
