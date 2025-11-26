@@ -18,10 +18,10 @@ No external libraries required.
 
 ## 📖 Tutorial
 
-Learn how to get started with DelphiWebDriver in this detailed article:
+Learn how to get started with DelphiWebDriver in these detailed articles:
 
-[DelphiWebDriver: The Most Powerful Delphi Library for Browser Automation](https://medium.com/@DA213/delphiwebdriver-the-most-powerful-delphi-library-for-browser-automation-b217e9106acc?postPublishedType=initial)
-[Automating OCR with DelphiWebDriver: From Screenshot to Text](https://medium.com/@DA213/automating-ocr-with-delphiwebdriver-from-screenshot-to-text-cc74ab84e07c)
+[![DelphiWebDriver: The Most Powerful Delphi Library for Browser Automation](https://img.shields.io/badge/Tutorial-DelphiWebDriver-blue)](https://medium.com/@DA213/delphiwebdriver-the-most-powerful-delphi-library-for-browser-automation-b217e9106acc?postPublishedType=initial)
+[![Automating OCR with DelphiWebDriver: From Screenshot to Text](https://img.shields.io/badge/Tutorial-Automating_OCR-green)](https://medium.com/@DA213/automating-ocr-with-delphiwebdriver-from-screenshot-to-text-cc74ab84e07c)
 
 More tutorials and guides will be added here soon.
 
