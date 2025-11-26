@@ -99,7 +99,7 @@ begin
       if LRes.TryGetValue<string>('ELEMENT', ElemId) then
         Exit(TWebElement.Create(FDriver, ElemId));
 
-      raise EWebDriverError.Create('Cannot extract element ID: ' + LRes.ToString);
+      // raise EWebDriverError.Create('Cannot extract element ID: ' + LRes.ToString);
     finally
       LRes.Free;
     end;
