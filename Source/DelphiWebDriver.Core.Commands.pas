@@ -15,6 +15,7 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.Net.HttpClient,
+  System.Net.URLClient,
   DelphiWebDriver.Interfaces,
   DelphiWebDriver.Types;
 
@@ -51,8 +52,14 @@ var
   LUrl: string;
   LResponse: IHTTPResponse;
   Stream: TStringStream;
+  Headers: TNetHeaders;
 begin
   LUrl := FBaseUrl + Endpoint;
+
+  SetLength(Headers, 1);
+  Headers[0].Name := 'Content-Type';
+  Headers[0].Value := 'application/json; charset=utf-8';
+
   Stream := nil;
   try
     if Assigned(Body) then
@@ -61,11 +68,11 @@ begin
       Stream := TStringStream.Create('{}', TEncoding.UTF8);
 
     if Method = 'POST' then
-      LResponse := FHTTP.Post(LUrl, Stream)
+      LResponse := FHTTP.Post(LUrl, Stream, nil, Headers)
     else if Method = 'DELETE' then
-      LResponse := FHTTP.Delete(LUrl)
+      LResponse := FHTTP.Delete(LUrl, nil, Headers)
     else
-      LResponse := FHTTP.Get(LUrl);
+      LResponse := FHTTP.Get(LUrl, nil, Headers);
 
     Result := TJSONObject.ParseJSONValue(LResponse.ContentAsString);
     if not Assigned(Result) then
