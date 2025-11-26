@@ -32,6 +32,8 @@ type
     function UntilUrlIs(const Value: string; TimeoutMS: Integer = 5000): Boolean;
     function UntilTitleIs(const Value: string; TimeoutMS: Integer = 5000): Boolean;
     function UntilTitleContains(const Text: string; TimeoutMS: Integer = 5000): Boolean;
+    function UntilElementTextIs(By: TBy; const Expected: string; TimeoutMS: Integer = 5000; IntervalMS: Integer = 200): Boolean;
+    function UntilElementTextContains(By: TBy; const Expected: string; TimeoutMS: Integer = 5000; IntervalMS: Integer = 200): Boolean;
   end;
 
 implementation
@@ -178,6 +180,54 @@ begin
     Sleep(IntervalMS);
   end;
   SetLength(Result, 0);
+end;
+
+function TWebDriverWait.UntilElementTextContains(By: TBy; const Expected: string; TimeoutMS, IntervalMS: Integer): Boolean;
+var
+  StartTime: TDateTime;
+  Elem: IWebElement;
+  Txt: string;
+begin
+  StartTime := Now;
+  while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
+  begin
+    try
+      Elem := FDriver.Elements.FindElement(By);
+      if Assigned(Elem) then
+      begin
+        Txt := Elem.GetText;
+        if Txt.ToLower.Contains(Expected.ToLower) then
+          Exit(True);
+      end;
+    except
+    end;
+    Sleep(IntervalMS);
+  end;
+  Result := False;
+end;
+
+function TWebDriverWait.UntilElementTextIs(By: TBy; const Expected: string; TimeoutMS, IntervalMS: Integer): Boolean;
+var
+  StartTime: TDateTime;
+  Elem: IWebElement;
+  Txt: string;
+begin
+  StartTime := Now;
+  while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
+  begin
+    try
+      Elem := FDriver.Elements.FindElement(By);
+      if Assigned(Elem) then
+      begin
+        Txt := Trim(Elem.GetText);
+        if SameText(Txt, Expected) then
+          Exit(True);
+      end;
+    except
+    end;
+    Sleep(IntervalMS);
+  end;
+  Result := False;
 end;
 
 procedure TWebDriverWait.UntilPageLoad(TimeoutMS: Integer);

@@ -63,6 +63,8 @@ type
     function UntilUrlIs(const Value: string; TimeoutMS: Integer = 5000): Boolean;
     function UntilTitleIs(const Value: string; TimeoutMS: Integer = 5000): Boolean;
     function UntilTitleContains(const Text: string; TimeoutMS: Integer = 5000): Boolean;
+    function UntilElementTextIs(By: TBy; const Expected: string; TimeoutMS: Integer = 5000; IntervalMS: Integer = 200): Boolean;
+    function UntilElementTextContains(By: TBy; const Expected: string; TimeoutMS: Integer = 5000; IntervalMS: Integer = 200): Boolean;
   end;
 
   IWebDriverDocument = interface
