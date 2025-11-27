@@ -1,4 +1,4 @@
-![Windows](https://img.shields.io/badge/OS-Windows-blue?logo=windows)
+![Windows](https://img.shields.io/badge/OS-Windows-blue?logo=windows) 
 ![Linux](https://img.shields.io/badge/OS-Linux-yellow?logo=linux)
 ![macOS](https://img.shields.io/badge/OS-macOS-black?logo=apple)
 
@@ -31,16 +31,20 @@ More tutorials and guides will be added here soon.
 
 If you find DelphiWebDriver useful, consider supporting its development ❤️
 
-**PayPal:**
-
+**PayPal:**  
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/ncp/payment/Q4KSUE7D7SU9N)
+
+**Bitcoin:**  
+**Address:** `14r9rqFf5rCW3HMLzT55FAzPVD6vdUDMDs`
+
+<img src="data:image/png;base64,MTRyOXJxRmY1ckNXM0hNTHpUNTVGQXpQVkQ2dmRVRE1Ecw==" width="220">
 
 ---
 
 ### 🔹 Why DelphiWebDriver?
 
-* Fully cross-platform: Windows, Linux, macOS
-* Pure Delphi implementation: no external dependencies
-* Automates all major browsers: Chrome, Firefox, Edge, Opera, Brave
-* Low-level command access & high-level convenience API
-* Lightweight, modern, and easy to integrate
+* Fully cross-platform: Windows, Linux, macOS  
+* Pure Delphi implementation: no external dependencies  
+* Automates all major browsers: Chrome, Firefox, Edge, Opera, Brave  
+* Low-level command access & high-level convenience API  
+* Lightweight, modern, and easy to integrate  
