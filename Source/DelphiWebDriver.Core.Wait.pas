@@ -235,6 +235,7 @@ var
   StartTime: TDateTime;
   Resp: TJSONValue;
   ReadyState: string;
+  ValueNode: TJSONValue;
 begin
   StartTime := Now;
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
@@ -242,12 +243,21 @@ begin
     try
       Resp := FDriver.Document.ExecuteScript('return document.readyState;', []);
       try
-        ReadyState := Resp.GetValue<string>('value');
+        ReadyState := '';
+        if Resp is TJSONString then
+        begin
+          ReadyState := TJSONString(Resp).Value;
+        end
+        else if Resp is TJSONObject then
+        begin
+          ValueNode := TJSONObject(Resp).GetValue('value');
+          if ValueNode is TJSONString then
+            ReadyState := TJSONString(ValueNode).Value;
+        end;
       finally
         Resp.Free;
       end;
-
-      if ReadyState = 'complete' then
+      if SameText(ReadyState, 'complete') then
         Exit;
     except
     end;
