@@ -24,6 +24,7 @@ uses
   DelphiWebDriver.Core.Alert,
   DelphiWebDriver.Core.Actions,
   DelphiWebDriver.Core.Timeouts,
+  DelphiWebDriver.Events,
   DelphiWebDriver.Types;
 
 type
@@ -44,6 +45,7 @@ type
     FAlert : IWebDriverAlert;
     FActions : IWebDriverActions;
     FTimeouts: IWebDriverTimeouts;
+    FEvents: IWebDriverEvents;
   public
     constructor Create(BrowserConfig: TWebDriverBrowserConfig; const ABaseUrl: string); virtual;
     function Capabilities: IWebDriverCapabilities;
@@ -59,6 +61,7 @@ type
     function Alert : IWebDriverAlert;
     function Actions : IWebDriverActions;
     function Timeouts : IWebDriverTimeouts;
+    function Events : IWebDriverEvents;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
 
@@ -111,6 +114,13 @@ begin
   if FElements = nil then
     FElements := TWebDriverElements.Create(Self as IWebDriver);
   Result := FElements;
+end;
+
+function TWebDriver.Events: IWebDriverEvents;
+begin
+  if FEvents = nil then
+    FEvents := TWebDriverEvents.Create;
+  Result := FEvents;
 end;
 
 function TWebDriver.Wait: IWebDriverWait;

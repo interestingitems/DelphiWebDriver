@@ -14,6 +14,8 @@ uses
   System.JSON;
 
 type
+  TWebDriverLoadEvent = reference to procedure;
+
   EWebDriverError = class(Exception);
 
   TWebDriverTimeoutsConfig = record

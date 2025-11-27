@@ -19,6 +19,18 @@ uses
 type
   IWebElement = interface;
 
+  IWebDriverEvents = interface
+    ['{8031D54C-A94B-4D97-9E0C-7F22A5AFADF6}']
+    function GetOnLoadComplete: TWebDriverLoadEvent;
+    procedure SetOnLoadComplete(const Callback: TWebDriverLoadEvent);
+    property OnLoadComplete: TWebDriverLoadEvent read GetOnLoadComplete write SetOnLoadComplete;
+  end;
+
+  IWebDriverEventsInternal = interface
+    ['{1B6041A7-711A-4E54-92BE-86CA6F9E4A3B}']
+    procedure TriggerLoadComplete;
+  end;
+
   IWebDriverTimeouts = interface
     ['{5E3C1A9F-7B42-4D94-9A8F-0F8E1E2C3B77}']
     function GetTimeouts: TWebDriverTimeoutsConfig;
@@ -202,6 +214,7 @@ type
     function Alert : IWebDriverAlert;
     function Actions : IWebDriverActions;
     function Timeouts : IWebDriverTimeouts;
+    function Events : IWebDriverEvents;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
 
