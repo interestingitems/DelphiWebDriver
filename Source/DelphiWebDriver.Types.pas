@@ -16,6 +16,7 @@ uses
 type
   TWebDriverLoadCompleteEvent = reference to procedure;
   TWebDriverLoadStartEvent = reference to procedure;
+  TWebDriverErrorEvent = reference to procedure(const Error: string);
 
   EWebDriverError = class(Exception);
 

@@ -263,7 +263,7 @@ begin
     end;
     Sleep(100);
   end;
-  raise EWebDriverError.Create('Timeout waiting for page to finish loading.');
+  (FDriver.Events as IWebDriverEventsInternal).TriggerError('Timeout waiting for page to finish loading.');
 end;
 
 end.

@@ -154,7 +154,7 @@ end;
 function TWebDriver.Commands: IWebDriverCommands;
 begin
   if FCommands = nil then
-    FCommands := TWebDriverCommands.Create(FBaseUrl);
+    FCommands := TWebDriverCommands.Create(Self as IWebDriver, FBaseUrl);
   Result := FCommands;
 end;
 

@@ -59,7 +59,8 @@ var
 begin
   Elem := FDriver.Elements.FindElement(By);
   if not Assigned(Elem) then
-    raise EWebDriverError.CreateFmt('Element not found for strategy: %s, value: %s', [By.Strategy, By.Value]);
+    (FDriver.Events as IWebDriverEventsInternal).TriggerError(Format('Element not found for strategy: %s, value: %s', [By.Strategy, By.Value]));
+
   Item.ActionType := TWebDriverActionItemType.MouseMove;
   Item.ElementId := Elem.ElementId;
   Item.X := X;
@@ -102,7 +103,8 @@ var
 begin
   Elem := FDriver.Elements.FindElement(By);
   if not Assigned(Elem) then
-    raise EWebDriverError.CreateFmt('Element not found for: %s = %s', [By.Strategy, By.Value]);
+    (FDriver.Events as IWebDriverEventsInternal).TriggerError(Format('Element not found for: %s = %s', [By.Strategy, By.Value]));
+
   Item.ActionType := TWebDriverActionItemType.ContextClick;
   Item.ElementId := Elem.ElementId;
   FActions.Add(Item);

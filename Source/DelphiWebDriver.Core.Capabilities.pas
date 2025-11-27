@@ -150,7 +150,7 @@ begin
   TFile.WriteAllText(BgPath, BgText, TEncoding.UTF8);
 
   if (not TFile.Exists(ManifestPath)) or (not TFile.Exists(BgPath)) then
-    raise Exception.Create('Failed to create proxy extension files in ' + ExtensionDir);
+    (FDriver.Events as IWebDriverEventsInternal).TriggerError('Failed to create proxy extension files in ' + ExtensionDir);
 
   Result := ExtensionDir;
 end;

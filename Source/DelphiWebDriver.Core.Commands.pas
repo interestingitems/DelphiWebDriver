@@ -22,10 +22,12 @@ uses
 type
   TWebDriverCommands = class(TInterfacedObject, IWebDriverCommands)
   private
+    [weak]
+    FDriver: IWebDriver;
     FHTTP: THTTPClient;
     FBaseUrl: string;
   public
-    constructor Create(BaseURL : String);
+    constructor Create(ADriver: IWebDriver; BaseURL : String);
     destructor Destroy; override;
     function SendCommand(const Method, Endpoint: string; Body: TJSONObject): TJSONValue;
   end;
@@ -34,9 +36,10 @@ implementation
 
 { TWebDriverCommands }
 
-constructor TWebDriverCommands.Create(BaseURL: String);
+constructor TWebDriverCommands.Create(ADriver: IWebDriver; BaseURL: String);
 begin
   inherited Create;
+  FDriver := ADriver;
   FHTTP := THTTPClient.Create;
   FBaseUrl := BaseURL;
 end;
@@ -76,8 +79,7 @@ begin
 
     Result := TJSONObject.ParseJSONValue(LResponse.ContentAsString);
     if not Assigned(Result) then
-      raise EWebDriverError.Create
-        ('Invalid JSON response received from WebDriver');
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Invalid JSON response received from WebDriver');
   finally
     Stream.Free;
   end;

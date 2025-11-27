@@ -25,6 +25,9 @@ type
     procedure SetOnLoadStart(const Callback: TWebDriverLoadStartEvent);
     function GetOnLoadComplete: TWebDriverLoadCompleteEvent;
     procedure SetOnLoadComplete(const Callback: TWebDriverLoadCompleteEvent);
+    function GetOnError: TWebDriverErrorEvent;
+    procedure SetOnError(const Callback: TWebDriverErrorEvent);
+    property OnError: TWebDriverErrorEvent read GetOnError write SetOnError;
     property OnLoadStart: TWebDriverLoadStartEvent read GetOnLoadStart write SetOnLoadStart;
     property OnLoadComplete: TWebDriverLoadCompleteEvent read GetOnLoadComplete write SetOnLoadComplete;
   end;
@@ -33,6 +36,7 @@ type
     ['{1B6041A7-711A-4E54-92BE-86CA6F9E4A3B}']
     procedure TriggerLoadStart;
     procedure TriggerLoadComplete;
+    procedure TriggerError(const Error: string);
   end;
 
   IWebDriverTimeouts = interface

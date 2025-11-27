@@ -44,7 +44,7 @@ begin
     '/session/' + FDriver.Sessions.GetSessionId + '/timeouts');
   try
     if not Resp.TryGetValue<TJSONObject>('value', Value) then
-      raise EWebDriverError.Create('Invalid GET timeouts response: ' + Resp.ToString);
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Invalid GET timeouts response: ' + Resp.ToString);
     Result.Script := Value.GetValue<Integer>('script');
     Result.PageLoad := Value.GetValue<Integer>('pageLoad');
     Result.Implicit := Value.GetValue<Integer>('implicit');
