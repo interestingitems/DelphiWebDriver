@@ -8,6 +8,7 @@ uses
   System.UITypes,
   System.Classes,
   System.Variants,
+  System.Threading,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -35,6 +36,7 @@ type
     procedure StartDriverButtonClick(Sender: TObject);
   private
     { Private declarations }
+    procedure Log(Msg : String);
   public
     { Public declarations }
   end;
@@ -52,10 +54,16 @@ uses
 
 {$R *.fmx}
 
+procedure TMainForm.Log(Msg: String);
+begin
+  TThread.Synchronize(nil, procedure
+    begin
+      LogsMemo.Lines.Add(Msg);
+    end);
+end;
+
 procedure TMainForm.StartDriverButtonClick(Sender: TObject);
 var
-  Server: TWebDriverServer;
-  Driver: IWebDriver;
   BrowserConfig : TWebDriverBrowserConfig;
 begin
   if ChromeRadioButton.IsChecked then
@@ -86,37 +94,53 @@ begin
   // if you have specific path for the driver path then set it with the BrowserConfig.Browser.DriverName
   // for ex : Server := TWebDriverServer.Create('C:\drivers_folder\' + BrowserConfig.Browser.DriverName);
 
-  Server := TWebDriverServer.Create(BrowserConfig.Browser.DriverName);
-  try
-    Server.Start;
-    Driver := TWebDriver.Create(BrowserConfig, 'http://localhost:9515');
-    try
-      Driver.Capabilities.Headless := HeadlessModeCheckBox.IsChecked;
+  TTask.run(procedure
+    var
+      Server: TWebDriverServer;
+      Driver: IWebDriver;
+    begin
+      Server := TWebDriverServer.Create(BrowserConfig.Browser.DriverName);
+        try
+          Server.Start;
+          Driver := TWebDriver.Create(BrowserConfig, 'http://localhost:9515');
+            try
+              Driver.Capabilities.Headless := HeadlessModeCheckBox.IsChecked;
+              var Proxy : TWebDriverProxy;
+              Proxy.Host := '';
+              Proxy.Port := 8080;
+              Proxy.Username := '';
+              Proxy.Password := '';
+              Proxy.EnableProxy := ProxyCheckBox.IsChecked;  // Fill proxy data and set "Proxy.EnableProxy" to True if you want to enable proxy
+              Driver.Capabilities.Proxy := Proxy;
+              Driver.Sessions.StartSession;
 
-      var Proxy : TWebDriverProxy;
-      Proxy.Host := '';
-      Proxy.Port := 8080;
-      Proxy.Username := '';
-      Proxy.Password := '';
-      Proxy.EnableProxy := ProxyCheckBox.IsChecked;  // Fill proxy data and set "Proxy.EnableProxy" to True if you want to enable proxy
+              Driver.Events.OnLoadStart := procedure
+                                           begin
+                                             Log('Loading Started...');
+                                           end;
 
-      Driver.Capabilities.Proxy := Proxy;
-      Driver.Sessions.StartSession;
-      Driver.Navigation.GoToURL('https://api.myip.com');
-      Driver.Wait.UntilPageLoad;
+              Driver.Events.OnLoadComplete := procedure
+                                              begin
+                                                Log('Loading Finish!');
+                                              end;
 
-      LogsMemo.Text := Driver.Elements.GetBodyElement.GetText;
+              Driver.Events.OnError := procedure(const Error: string)
+                                       begin
+                                         Log('Error : ' + Error);
+                                       end;
 
-      ShowMessage('Msg Sent :)');
 
-    finally
-      Driver.Sessions.Quit;
-    end;
-  finally
-    Server.Stop;
-    Server.Free;
-  end;
+              Driver.Navigation.GoToURL('https://www.google.com');
 
+              Log('Operation Done :)');
+            finally
+              Driver.Sessions.Quit;
+            end;
+        finally
+          Server.Stop;
+          Server.Free;
+        end;
+    end);
 end;
 
 end.
