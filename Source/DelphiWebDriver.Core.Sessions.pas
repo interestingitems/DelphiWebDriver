@@ -100,7 +100,7 @@ begin
         LRes.TryGetValue<string>('sessionId', FSessionId);
 
       if FSessionId = '' then
-        (FDriver.Events as IWebDriverEventsInternal).TriggerError('SessionId not found: ' + LRes.ToString);
+        (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverSessions.StartSession] : SessionId not found: ' + LRes.ToString);
 
       FWindowHandle := FDriver.Contexts.GetWindowHandle;
 

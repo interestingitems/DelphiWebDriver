@@ -123,7 +123,8 @@ begin
     Elem := FDriver.Elements.FindElement(By);
   except
     on E: EWebDriverError do
-      (FDriver.Events as IWebDriverEventsInternal).TriggerError(Format('Element not found for screenshot: %s=%s', [By.Strategy, By.Value]));
+      (FDriver.Events as IWebDriverEventsInternal).
+        TriggerError(Format('[TWebDriverScreenshot.TakeElementScreenshot] : Element not found for screenshot: %s=%s', [By.Strategy, By.Value]));
   end;
   if not Assigned(Elem) then
   begin

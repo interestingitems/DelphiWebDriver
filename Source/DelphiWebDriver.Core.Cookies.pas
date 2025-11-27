@@ -50,7 +50,7 @@ begin
   for Cookie in All do
     if SameText(Cookie.Name, Name) then
       Exit(Cookie);
-  (FDriver.Events as IWebDriverEventsInternal).TriggerError('Cookie "' + Name + '" not found');
+  (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverCookies.GetByName] : Cookie "' + Name + '" not found');
 end;
 
 function TWebDriverCookies.Exists(const Name: string): Boolean;

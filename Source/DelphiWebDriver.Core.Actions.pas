@@ -59,7 +59,8 @@ var
 begin
   Elem := FDriver.Elements.FindElement(By);
   if not Assigned(Elem) then
-    (FDriver.Events as IWebDriverEventsInternal).TriggerError(Format('Element not found for strategy: %s, value: %s', [By.Strategy, By.Value]));
+    (FDriver.Events as IWebDriverEventsInternal).
+      TriggerError(Format('[TWebDriverActions.MoveToElement] : Element not found for strategy: %s, value: %s', [By.Strategy, By.Value]));
 
   Item.ActionType := TWebDriverActionItemType.MouseMove;
   Item.ElementId := Elem.ElementId;
@@ -103,7 +104,8 @@ var
 begin
   Elem := FDriver.Elements.FindElement(By);
   if not Assigned(Elem) then
-    (FDriver.Events as IWebDriverEventsInternal).TriggerError(Format('Element not found for: %s = %s', [By.Strategy, By.Value]));
+    (FDriver.Events as IWebDriverEventsInternal).
+      TriggerError(Format('[TWebDriverActions.ContextClick] : Element not found for: %s = %s', [By.Strategy, By.Value]));
 
   Item.ActionType := TWebDriverActionItemType.ContextClick;
   Item.ElementId := Elem.ElementId;

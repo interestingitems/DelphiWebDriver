@@ -57,6 +57,7 @@ var
   Stream: TStringStream;
   Headers: TNetHeaders;
 begin
+  Result := nil; // make sure to initialize
   LUrl := FBaseUrl + Endpoint;
 
   SetLength(Headers, 1);
@@ -65,21 +66,31 @@ begin
 
   Stream := nil;
   try
-    if Assigned(Body) then
-      Stream := TStringStream.Create(Body.ToJSON, TEncoding.UTF8)
-    else
-      Stream := TStringStream.Create('{}', TEncoding.UTF8);
+    try
+      if Assigned(Body) then
+        Stream := TStringStream.Create(Body.ToJSON, TEncoding.UTF8)
+      else
+        Stream := TStringStream.Create('{}', TEncoding.UTF8);
 
-    if Method = 'POST' then
-      LResponse := FHTTP.Post(LUrl, Stream, nil, Headers)
-    else if Method = 'DELETE' then
-      LResponse := FHTTP.Delete(LUrl, nil, Headers)
-    else
-      LResponse := FHTTP.Get(LUrl, nil, Headers);
+      if Method = 'POST' then
+        LResponse := FHTTP.Post(LUrl, Stream, nil, Headers)
+      else if Method = 'DELETE' then
+        LResponse := FHTTP.Delete(LUrl, nil, Headers)
+      else
+        LResponse := FHTTP.Get(LUrl, nil, Headers);
 
-    Result := TJSONObject.ParseJSONValue(LResponse.ContentAsString);
-    if not Assigned(Result) then
-      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Invalid JSON response received from WebDriver');
+      Result := TJSONObject.ParseJSONValue(LResponse.ContentAsString);
+
+      if not Assigned(Result) then
+        (FDriver.Events as IWebDriverEventsInternal)
+          .TriggerError('[TWebDriverCommands.SendCommand] : Invalid JSON response received from WebDriver = ' + LResponse.ContentAsString);
+
+    except
+      on E: Exception do
+      begin
+        (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverCommands.SendCommand] : ' + E.Message);
+      end;
+    end;
   finally
     Stream.Free;
   end;

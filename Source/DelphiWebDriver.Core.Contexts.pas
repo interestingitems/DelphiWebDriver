@@ -132,7 +132,7 @@ begin
   try
     ValueObj := Resp.GetValue<TJSONObject>('value');
       if not Assigned(ValueObj) then
-        (FDriver.Events as IWebDriverEventsInternal).TriggerError('GetWindowPosition: no value returned');
+        (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverContexts.GetWindowPosition] : no value returned');
     Result.X := ValueObj.GetValue<Integer>('x');
     Result.Y := ValueObj.GetValue<Integer>('y');
   finally
@@ -149,7 +149,7 @@ begin
   try
     ValueObj := Resp.GetValue<TJSONObject>('value');
       if not Assigned(ValueObj) then
-        (FDriver.Events as IWebDriverEventsInternal).TriggerError('GetWindowSize: no value returned');
+        (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverContexts.GetWindowSize] : no value returned');
     Result.cx := ValueObj.GetValue<Integer>('width');
     Result.cy := ValueObj.GetValue<Integer>('height');
   finally
@@ -231,7 +231,7 @@ begin
     try
       ValueObj := JSON.GetValue<TJSONObject>('value');
       if not Assigned(ValueObj) then
-        (FDriver.Events as IWebDriverEventsInternal).TriggerError('NewWindow: no value returned');
+        (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverContexts.NewWindow] : no value returned');
       Result := ValueObj.GetValue<string>('handle');
     finally
       JSON.Free;
@@ -284,7 +284,7 @@ end;
 procedure TWebDriverContexts.SwitchToMainWindow;
 begin
   if FDriver.Sessions.GetWindowHandle = '' then
-    (FDriver.Events as IWebDriverEventsInternal).TriggerError('Main window handle not stored.');
+    (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverContexts.SwitchToMainWindow] : Main window handle not stored.');
   SwitchToWindow(FDriver.Sessions.GetWindowHandle);
 end;
 
@@ -325,7 +325,7 @@ var
 begin
   Handles := GetWindowHandles;
   if (Index < 0) or (Index >= Length(Handles)) then
-    (FDriver.Events as IWebDriverEventsInternal).TriggerError('Invalid window index ' + Index.ToString);
+    (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverContexts.SwitchToWindowIndex] : Invalid window index ' + Index.ToString);
   Body := TJSONObject.Create;
   try
     Body.AddPair('handle', Handles[Index]);

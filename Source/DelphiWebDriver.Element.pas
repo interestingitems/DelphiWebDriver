@@ -141,7 +141,7 @@ var
 begin
   Options := FindElements(TBy.TagName('option'));
   if (Index < 0) or (Index >= Length(Options)) then
-    (FDriver.Events as IWebDriverEventsInternal).TriggerError('SelectByIndex: index %d out of bounds ' + Index.ToString);
+    (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebElement.SelectByIndex] : index %d out of bounds ' + Index.ToString);
   Options[Index].Click;
 end;
 
@@ -157,7 +157,7 @@ begin
       Opt.Click;
       Exit;
     end;
-  (FDriver.Events as IWebDriverEventsInternal).TriggerError('SelectByText: no option with text ' + Text);
+  (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebElement.SelectByText] : no option with text ' + Text);
 end;
 
 procedure TWebElement.SelectByValue(const Value: string);
@@ -172,7 +172,7 @@ begin
       Opt.Click;
       Exit;
     end;
-  (FDriver.Events as IWebDriverEventsInternal).TriggerError('SelectByValue: no option value ' + Value);
+  (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebElement.SelectByValue] : no option value ' + Value);
 end;
 
 procedure TWebElement.SendKeys(const Text: string);
@@ -438,7 +438,7 @@ begin
       if LRes.TryGetValue<string>('ELEMENT', ElemId) then
         Exit(TWebElement.Create(FDriver, ElemId));
 
-      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Cannot extract element ID: ' + LRes.ToString);
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebElement.FindElement] : Cannot extract element ID: ' + LRes.ToString);
     finally
       LRes.Free;
     end;
