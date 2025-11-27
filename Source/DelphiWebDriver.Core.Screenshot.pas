@@ -28,6 +28,8 @@ type
     procedure SaveScreenshotToFile(const FileName: string);
     function TakeElementScreenshot(By: TBy): TBytes;
     procedure SaveElementScreenshotToFile(By: TBy; const FileName: string);
+    function PrintPdfPage: string;
+    function SavePrintedPdfPage(const FileName: string): Boolean;
   end;
 
 implementation
@@ -38,6 +40,48 @@ constructor TWebDriverScreenshot.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
+end;
+
+function TWebDriverScreenshot.PrintPdfPage: string;
+var
+  Body: TJSONObject;
+  Res: TJSONValue;
+begin
+  Body := TJSONObject.Create;
+  try
+    Res := FDriver.Commands.SendCommand(
+      'POST',
+      '/session/' + FDriver.Sessions.GetSessionId + '/print',
+      Body
+    );
+    try
+      Result := Res.GetValue<string>('value');
+    finally
+      Res.Free;
+    end;
+  finally
+    Body.Free;
+  end;
+end;
+
+function TWebDriverScreenshot.SavePrintedPdfPage(const FileName: string): Boolean;
+var
+  Base64Pdf: string;
+  PdfBytes: TBytes;
+  FS: TFileStream;
+begin
+  Result := False;
+  Base64Pdf := PrintPdfPage;
+  if Base64Pdf = '' then
+    Exit;
+  PdfBytes := TNetEncoding.Base64.DecodeStringToBytes(Base64Pdf);
+  FS := TFileStream.Create(FileName, fmCreate);
+  try
+    FS.WriteBuffer(PdfBytes, Length(PdfBytes));
+    Result := True;
+  finally
+    FS.Free;
+  end;
 end;
 
 procedure TWebDriverScreenshot.SaveElementScreenshotToFile(By: TBy; const FileName: string);

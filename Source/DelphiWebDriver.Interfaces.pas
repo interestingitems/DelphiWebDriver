@@ -51,6 +51,8 @@ type
     procedure SaveScreenshotToFile(const FileName: string);
     function TakeElementScreenshot(By: TBy): TBytes;
     procedure SaveElementScreenshotToFile(By: TBy; const FileName: string);
+    function PrintPdfPage: string;
+    function SavePrintedPdfPage(const FileName: string): Boolean;
   end;
 
   IWebDriverWait = interface
@@ -77,8 +79,6 @@ type
     procedure ScrollBy(X, Y: Integer);
     procedure ScrollToTop;
     procedure ScrollToBottom;
-    function PrintPdfPage: string;
-    function SavePrintedPdfPage(const FileName: string): Boolean;
   end;
 
   IWebDriverCommands = interface
