@@ -69,8 +69,11 @@ var
 begin
   JSON := TJSONObject.Create;
   try
+    (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
+
     FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/back',
       JSON).Free;
+
     FDriver.Wait.UntilPageLoad;
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadComplete;
   finally
@@ -84,8 +87,11 @@ var
 begin
   JSON := TJSONObject.Create;
   try
+    (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
+
     FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/forward',
       JSON).Free;
+
     FDriver.Wait.UntilPageLoad;
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadComplete;
   finally
@@ -100,6 +106,8 @@ begin
   JSON := TJSONObject.Create;
   try
     JSON.AddPair('url', Url);
+
+    (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
 
     FDriver.Commands.SendCommand('POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/url',
@@ -119,6 +127,8 @@ var
 begin
   JSON := TJSONObject.Create;
   try
+    (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
+
     FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/refresh',
       JSON).Free;
 

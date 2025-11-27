@@ -21,13 +21,17 @@ type
 
   IWebDriverEvents = interface
     ['{8031D54C-A94B-4D97-9E0C-7F22A5AFADF6}']
-    function GetOnLoadComplete: TWebDriverLoadEvent;
-    procedure SetOnLoadComplete(const Callback: TWebDriverLoadEvent);
-    property OnLoadComplete: TWebDriverLoadEvent read GetOnLoadComplete write SetOnLoadComplete;
+    function GetOnLoadStart: TWebDriverLoadStartEvent;
+    procedure SetOnLoadStart(const Callback: TWebDriverLoadStartEvent);
+    function GetOnLoadComplete: TWebDriverLoadCompleteEvent;
+    procedure SetOnLoadComplete(const Callback: TWebDriverLoadCompleteEvent);
+    property OnLoadStart: TWebDriverLoadStartEvent read GetOnLoadStart write SetOnLoadStart;
+    property OnLoadComplete: TWebDriverLoadCompleteEvent read GetOnLoadComplete write SetOnLoadComplete;
   end;
 
   IWebDriverEventsInternal = interface
     ['{1B6041A7-711A-4E54-92BE-86CA6F9E4A3B}']
+    procedure TriggerLoadStart;
     procedure TriggerLoadComplete;
   end;
 

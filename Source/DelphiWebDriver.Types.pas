@@ -14,7 +14,8 @@ uses
   System.JSON;
 
 type
-  TWebDriverLoadEvent = reference to procedure;
+  TWebDriverLoadCompleteEvent = reference to procedure;
+  TWebDriverLoadStartEvent = reference to procedure;
 
   EWebDriverError = class(Exception);
 
