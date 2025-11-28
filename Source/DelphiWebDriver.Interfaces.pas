@@ -154,6 +154,7 @@ type
     procedure Quit;
     function GetSessionId: string;
     function GetWindowHandle: string;
+    function GetWebSocketUrl: string;
   end;
 
   IWebDriverCapabilities = interface

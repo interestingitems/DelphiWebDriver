@@ -21,12 +21,14 @@ type
     FDriver: IWebDriver;
     FSessionId: string;
     FWindowHandle: string;
+    FWebSocketUrl: string;
   public
     constructor Create(ADriver: IWebDriver);
     function StartSession: string;
     procedure Quit;
     function GetSessionId: string;
     function GetWindowHandle: string;
+    function GetWebSocketUrl: string;
   end;
 
 implementation
@@ -37,6 +39,11 @@ constructor TWebDriverSessions.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
+end;
+
+function TWebDriverSessions.GetWebSocketUrl: string;
+begin
+  Result := FWebSocketUrl;
 end;
 
 function TWebDriverSessions.GetWindowHandle: string;
@@ -63,6 +70,7 @@ var
   LRes, LValue: TJSONValue;
   LSessionObj: TJSONObject;
 begin
+  LSessionObj := nil;
   CapObj := FDriver.Capabilities.ToJSON;
   try
     if FDriver.BrowserConfig.Browser = wdbOpera then
@@ -103,6 +111,27 @@ begin
         (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverSessions.StartSession] : SessionId not found: ' + LRes.ToString);
 
       FWindowHandle := FDriver.Contexts.GetWindowHandle;
+
+      FWebSocketUrl := '';
+      // OPERA WebSocket URL lives at: value.webSocketUrl
+      if FDriver.BrowserConfig.Browser = wdbOpera then
+        begin
+          if Assigned(LValue) and (LValue is TJSONObject) then
+          LSessionObj.TryGetValue<string>('webSocketUrl', FWebSocketUrl);
+        end
+      else
+        begin
+        if Assigned(LValue) and (LValue is TJSONObject) then
+        begin
+          var CapabilitiesObj: TJSONObject := nil;
+          if LSessionObj.TryGetValue<TJSONObject>('capabilities', CapabilitiesObj) then
+            CapabilitiesObj.TryGetValue<string>('webSocketUrl', FWebSocketUrl);
+        end;
+      end;
+
+      if FWebSocketUrl = '' then
+       (FDriver.Events as IWebDriverEventsInternal)
+         .TriggerError('[TWebDriverSessions.StartSession] : BiDi enabled but WebSocketUrl not returned. Raw JSON: ' + LRes.ToString);
 
       Result := FSessionId;
     finally
