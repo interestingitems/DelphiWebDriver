@@ -211,6 +211,7 @@ begin
 
   CapObj := TJSONObject.Create;
   CapObj.AddPair('browserName', FDriver.BrowserConfig.Browser.Name);
+  CapObj.AddPair('webSocketUrl', TJSONBool.Create(True));
 
   case FDriver.BrowserConfig.Browser of
     wdbChrome, wdbBrave:
