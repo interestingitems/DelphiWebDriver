@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Screenshot;
+unit DelphiWebDriver.Core.Classic.Screenshot;
 
 interface
 

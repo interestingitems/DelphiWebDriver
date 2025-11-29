@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Cookies;
+unit DelphiWebDriver.Core.Classic.Cookies;
 
 interface
 

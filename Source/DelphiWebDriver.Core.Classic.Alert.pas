@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Alert;
+unit DelphiWebDriver.Core.Classic.Alert;
 
 interface
 

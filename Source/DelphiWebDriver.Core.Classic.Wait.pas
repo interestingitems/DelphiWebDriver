@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Wait;
+unit DelphiWebDriver.Core.Classic.Wait;
 
 interface
 

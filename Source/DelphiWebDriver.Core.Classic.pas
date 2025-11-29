@@ -11,17 +11,17 @@ interface
 
 uses
   DelphiWebDriver.Interfaces,
-  DelphiWebDriver.Core.Navigation,
-  DelphiWebDriver.Core.Contexts,
-  DelphiWebDriver.Core.Cookies,
-  DelphiWebDriver.Core.Elements,
-  DelphiWebDriver.Core.Commands,
-  DelphiWebDriver.Core.Document,
-  DelphiWebDriver.Core.Wait,
-  DelphiWebDriver.Core.Screenshot,
-  DelphiWebDriver.Core.Alert,
-  DelphiWebDriver.Core.Actions,
-  DelphiWebDriver.Core.Timeouts,
+  DelphiWebDriver.Core.Classic.Navigation,
+  DelphiWebDriver.Core.Classic.Contexts,
+  DelphiWebDriver.Core.Classic.Cookies,
+  DelphiWebDriver.Core.Classic.Elements,
+  DelphiWebDriver.Core.Classic.Commands,
+  DelphiWebDriver.Core.Classic.Document,
+  DelphiWebDriver.Core.Classic.Wait,
+  DelphiWebDriver.Core.Classic.Screenshot,
+  DelphiWebDriver.Core.Classic.Alert,
+  DelphiWebDriver.Core.Classic.Actions,
+  DelphiWebDriver.Core.Classic.Timeouts,
   DelphiWebDriver.Types;
 
 type

@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Actions;
+unit DelphiWebDriver.Core.Classic.Actions;
 
 interface
 

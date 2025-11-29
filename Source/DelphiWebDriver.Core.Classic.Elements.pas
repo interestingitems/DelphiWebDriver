@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Elements;
+unit DelphiWebDriver.Core.Classic.Elements;
 
 interface
 
@@ -14,7 +14,7 @@ uses
   System.Generics.Collections,
   DelphiWebDriver.Interfaces,
   DelphiWebDriver.Types,
-  DelphiWebDriver.Element;
+  DelphiWebDriver.Core.Classic.Element;
 
 type
   TWebDriverElements = class(TInterfacedObject, IWebDriverElements)

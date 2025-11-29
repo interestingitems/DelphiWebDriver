@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Timeouts;
+unit DelphiWebDriver.Core.Classic.Timeouts;
 
 interface
 

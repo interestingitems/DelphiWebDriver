@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Navigation;
+unit DelphiWebDriver.Core.Classic.Navigation;
 
 interface
 

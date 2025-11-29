@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Commands;
+unit DelphiWebDriver.Core.Classic.Commands;
 
 interface
 

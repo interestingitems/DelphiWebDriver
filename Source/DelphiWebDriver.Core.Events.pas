@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Events;
+unit DelphiWebDriver.Core.Events;
 
 interface
 

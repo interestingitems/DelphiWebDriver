@@ -5,7 +5,7 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Core.Document;
+unit DelphiWebDriver.Core.Classic.Document;
 
 interface
 

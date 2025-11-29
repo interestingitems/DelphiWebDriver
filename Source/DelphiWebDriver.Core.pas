@@ -14,7 +14,7 @@ uses
   DelphiWebDriver.Core.Capabilities,
   DelphiWebDriver.Core.Sessions,
   DelphiWebDriver.Core.Classic,
-  DelphiWebDriver.Events,
+  DelphiWebDriver.Core.Events,
   DelphiWebDriver.Types;
 
 type
