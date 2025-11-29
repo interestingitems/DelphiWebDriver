@@ -40,7 +40,7 @@ var
   Value: TJSONObject;
   Resp: TJSONValue;
 begin
-  Resp := FDriver.Commands.SendCommand('GET',
+  Resp := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/timeouts');
   try
     if not Resp.TryGetValue<TJSONObject>('value', Value) then
@@ -64,7 +64,7 @@ begin
     Body.AddPair('implicit', TJSONNumber.Create(Timeouts.Implicit));
     Body.AddPair('pageLoad', TJSONNumber.Create(Timeouts.PageLoad));
     Body.AddPair('script', TJSONNumber.Create(Timeouts.Script));
-    Resp := FDriver.Commands.SendCommand(
+    Resp := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/timeouts',
       Body

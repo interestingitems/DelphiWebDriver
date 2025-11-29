@@ -49,7 +49,7 @@ var
 begin
   Body := TJSONObject.Create;
   try
-    Res := FDriver.Commands.SendCommand(
+    Res := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/print',
       Body
@@ -120,7 +120,7 @@ var
 begin
   Elem := nil;
   try
-    Elem := FDriver.Elements.FindElement(By);
+    Elem := FDriver.Classic.Elements.FindElement(By);
   except
     on E: EWebDriverError do
       (FDriver.Events as IWebDriverEventsInternal).
@@ -131,7 +131,7 @@ begin
     SetLength(Result, 0);
     Exit;
   end;
-  JSON := FDriver.Commands.SendCommand(
+  JSON := FDriver.Classic.Commands.SendCommand(
     'GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + Elem.ElementId + '/screenshot'
   );
@@ -148,7 +148,7 @@ var
   JSON: TJSONValue;
   Base64Str: string;
 begin
-  JSON := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/screenshot');
+  JSON := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/screenshot');
   try
     Base64Str := JSON.GetValue<string>('value');
     Result := TNetEncoding.Base64.DecodeStringToBytes(Base64Str);

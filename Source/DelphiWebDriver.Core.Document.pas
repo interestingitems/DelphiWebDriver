@@ -60,7 +60,7 @@ begin
     for S in Args do
       Arr.AddElement(TJSONString.Create(S));
 
-    Result := FDriver.Commands.SendCommand(
+    Result := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/execute/async',
       Body
@@ -97,7 +97,7 @@ begin
     for S in Args do
       Arr.Add(S);
 
-    Result := FDriver.Commands.SendCommand('POST',
+    Result := FDriver.Classic.Commands.SendCommand('POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/execute/sync',
       Body
     );
@@ -122,7 +122,7 @@ function TWebDriverDocument.GetPageSource: string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/source');
+  JSON := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/source');
   try
     Result := JSON.GetValue<string>('value');
   finally

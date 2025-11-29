@@ -43,7 +43,7 @@ function TWebDriverNavigation.GetCurrentUrl: string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/url');
+  JSON := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/url');
   try
     Result := JSON.GetValue<string>('value');
   finally
@@ -55,7 +55,7 @@ function TWebDriverNavigation.GetTitle: string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/title');
+  JSON := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/title');
   try
     Result := JSON.GetValue<string>('value');
   finally
@@ -71,10 +71,10 @@ begin
   try
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
 
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/back',
+    FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/back',
       JSON).Free;
 
-    FDriver.Wait.UntilPageLoad;
+    FDriver.Classic.Wait.UntilPageLoad;
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadComplete;
   finally
     JSON.Free;
@@ -89,10 +89,10 @@ begin
   try
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
 
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/forward',
+    FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/forward',
       JSON).Free;
 
-    FDriver.Wait.UntilPageLoad;
+    FDriver.Classic.Wait.UntilPageLoad;
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadComplete;
   finally
     JSON.Free;
@@ -109,12 +109,12 @@ begin
 
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
 
-    FDriver.Commands.SendCommand('POST',
+    FDriver.Classic.Commands.SendCommand('POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/url',
       JSON
     ).Free;
 
-    FDriver.Wait.UntilPageLoad;
+    FDriver.Classic.Wait.UntilPageLoad;
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadComplete;
   finally
     JSON.Free;
@@ -129,10 +129,10 @@ begin
   try
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadStart;
 
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/refresh',
+    FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/refresh',
       JSON).Free;
 
-    FDriver.Wait.UntilPageLoad;
+    FDriver.Classic.Wait.UntilPageLoad;
     (FDriver.Events as IWebDriverEventsInternal).TriggerLoadComplete;
   finally
     JSON.Free;

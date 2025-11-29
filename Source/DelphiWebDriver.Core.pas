@@ -13,17 +13,7 @@ uses
   DelphiWebDriver.Interfaces,
   DelphiWebDriver.Core.Capabilities,
   DelphiWebDriver.Core.Sessions,
-  DelphiWebDriver.Core.Navigation,
-  DelphiWebDriver.Core.Contexts,
-  DelphiWebDriver.Core.Cookies,
-  DelphiWebDriver.Core.Elements,
-  DelphiWebDriver.Core.Commands,
-  DelphiWebDriver.Core.Document,
-  DelphiWebDriver.Core.Wait,
-  DelphiWebDriver.Core.Screenshot,
-  DelphiWebDriver.Core.Alert,
-  DelphiWebDriver.Core.Actions,
-  DelphiWebDriver.Core.Timeouts,
+  DelphiWebDriver.Core.Classic,
   DelphiWebDriver.Events,
   DelphiWebDriver.Types;
 
@@ -34,33 +24,13 @@ type
     FBrowserConfig: TWebDriverBrowserConfig;
     FCapabilities : IWebDriverCapabilities;
     FSessions : IWebDriverSessions;
-    FNavigation : IWebDriverNavigation;
-    FContexts : IWebDriverContexts;
-    FElements : IWebDriverElements;
-    FCookies: IWebDriverCookies;
-    FCommands: IWebDriverCommands;
-    FDocument : IWebDriverDocument;
-    FWait : IWebDriverWait;
-    FScreenshot : IWebDriverScreenshot;
-    FAlert : IWebDriverAlert;
-    FActions : IWebDriverActions;
-    FTimeouts: IWebDriverTimeouts;
+    FClassic: IWebDriverClassic;
     FEvents: IWebDriverEvents;
   public
     constructor Create(BrowserConfig: TWebDriverBrowserConfig; const ABaseUrl: string); virtual;
     function Capabilities: IWebDriverCapabilities;
     function Sessions : IWebDriverSessions;
-    function Navigation : IWebDriverNavigation;
-    function Contexts : IWebDriverContexts;
-    function Elements : IWebDriverElements;
-    function Cookies: IWebDriverCookies;
-    function Commands: IWebDriverCommands;
-    function Document : IWebDriverDocument;
-    function Wait : IWebDriverWait;
-    function Screenshot : IWebDriverScreenshot;
-    function Alert : IWebDriverAlert;
-    function Actions : IWebDriverActions;
-    function Timeouts : IWebDriverTimeouts;
+    function Classic : IWebDriverClassic;
     function Events : IWebDriverEvents;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
@@ -76,27 +46,6 @@ begin
   FBrowserConfig := BrowserConfig;
 end;
 
-function TWebDriver.Document: IWebDriverDocument;
-begin
-  if FDocument = nil then
-    FDocument := TWebDriverDocument.Create(Self as IWebDriver);
-  Result := FDocument;
-end;
-
-function TWebDriver.Actions: IWebDriverActions;
-begin
-  if FActions = nil then
-    FActions := TWebDriverActions.Create(Self as IWebDriver);
-  Result := FActions;
-end;
-
-function TWebDriver.Alert: IWebDriverAlert;
-begin
-  if FAlert = nil then
-    FAlert := TWebDriverAlert.Create(Self as IWebDriver);
-  Result := FAlert;
-end;
-
 function TWebDriver.BrowserConfig: TWebDriverBrowserConfig;
 begin
   Result := FBrowserConfig;
@@ -109,11 +58,11 @@ begin
   Result := FCapabilities;
 end;
 
-function TWebDriver.Elements: IWebDriverElements;
+function TWebDriver.Classic: IWebDriverClassic;
 begin
-  if FElements = nil then
-    FElements := TWebDriverElements.Create(Self as IWebDriver);
-  Result := FElements;
+  if FClassic = nil then
+    FClassic := TWebDriverClassic.Create(Self as IWebDriver, FBaseUrl);
+  Result := FClassic;
 end;
 
 function TWebDriver.Events: IWebDriverEvents;
@@ -123,60 +72,11 @@ begin
   Result := FEvents;
 end;
 
-function TWebDriver.Wait: IWebDriverWait;
-begin
-  if FWait = nil then
-    FWait := TWebDriverWait.Create(Self as IWebDriver);
-  Result := FWait;
-end;
-
 function TWebDriver.Sessions: IWebDriverSessions;
 begin
   if FSessions = nil then
     FSessions := TWebDriverSessions.Create(Self as IWebDriver);
   Result := FSessions;
-end;
-
-function TWebDriver.Timeouts: IWebDriverTimeouts;
-begin
-  if FTimeouts = nil then
-    FTimeouts := TWebDriverTimeouts.Create(Self as IWebDriver);
-  Result := FTimeouts;
-end;
-
-function TWebDriver.Navigation: IWebDriverNavigation;
-begin
-  if FNavigation = nil then
-    FNavigation := TWebDriverNavigation.Create(Self as IWebDriver);
-  Result := FNavigation;
-end;
-
-function TWebDriver.Commands: IWebDriverCommands;
-begin
-  if FCommands = nil then
-    FCommands := TWebDriverCommands.Create(Self as IWebDriver, FBaseUrl);
-  Result := FCommands;
-end;
-
-function TWebDriver.Contexts: IWebDriverContexts;
-begin
-  if FContexts = nil then
-    FContexts := TWebDriverContexts.Create(Self as IWebDriver);
-  Result := FContexts;
-end;
-
-function TWebDriver.Cookies: IWebDriverCookies;
-begin
-  if FCookies = nil then
-    FCookies := TWebDriverCookies.Create(Self as IWebDriver);
-  Result := FCookies;
-end;
-
-function TWebDriver.Screenshot: IWebDriverScreenshot;
-begin
-  if FScreenshot = nil then
-    FScreenshot := TWebDriverScreenshot.Create(Self as IWebDriver);
-  Result := FScreenshot;
 end;
 
 end.

@@ -88,7 +88,7 @@ begin
     ArrayArgs.Add(ElementObj);
     Params.AddPair('script', Script);
     Params.AddPair('args', ArrayArgs);
-    FDriver.Commands.SendCommand(
+    FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/execute/sync',
       Params
@@ -104,7 +104,7 @@ var
 begin
   Body := TJSONObject.Create;
   try
-    FDriver.Commands.SendCommand('POST',
+    FDriver.Classic.Commands.SendCommand('POST',
       '/session/' + FDriver.Sessions.GetSessionId +
       '/element/' + FElementId + '/click',
       Body
@@ -123,7 +123,7 @@ begin
     if FDriver.BrowserConfig.Browser = wdbOpera then
       Body.AddPair('id', FElementId);
 
-    FDriver.Commands.SendCommand(
+    FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId +
       '/element/' + FElementId + '/clear',
@@ -195,7 +195,7 @@ begin
   try
     if FDriver.BrowserConfig.Browser = wdbOpera then
     begin
-      FDriver.Commands.SendCommand(
+      FDriver.Classic.Commands.SendCommand(
         'POST',
         '/session/' + FDriver.Sessions.GetSessionId +
         '/element/' + FElementId + '/value',
@@ -204,7 +204,7 @@ begin
     end
     else
     begin
-      FDriver.Commands.SendCommand(
+      FDriver.Classic.Commands.SendCommand(
         'POST',
         '/session/' + FDriver.Sessions.GetSessionId +
         '/element/' + FElementId + '/value',
@@ -223,7 +223,7 @@ var
 begin
   JSON := TJSONObject.Create;
   try
-    FDriver.Commands.SendCommand('POST',
+    FDriver.Classic.Commands.SendCommand('POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId + '/submit',
       JSON
     ).Free;
@@ -236,7 +236,7 @@ function TWebElement.GetText: string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId + '/text'
   );
   try
@@ -250,7 +250,7 @@ function TWebElement.GetAttribute(const Attr: string): string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/attribute/' + Attr
   );
@@ -265,7 +265,7 @@ function TWebElement.GetDomAttribute(const Attr: string): string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/attribute/' + Attr
   );
@@ -280,7 +280,7 @@ function TWebElement.GetProperty(const Prop: string): string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/property/' + Prop
   );
@@ -295,7 +295,7 @@ function TWebElement.GetDomProperty(const Prop: string): string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/property/' + Prop
   );
@@ -310,7 +310,7 @@ function TWebElement.GetCssValue(const Name: string): string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/css/' + Name
   );
@@ -325,7 +325,7 @@ function TWebElement.IsDisplayed: Boolean;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/displayed'
   );
@@ -340,7 +340,7 @@ function TWebElement.IsEnabled: Boolean;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/enabled'
   );
@@ -355,7 +355,7 @@ function TWebElement.IsSelected: Boolean;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId +
     '/selected'
   );
@@ -371,7 +371,7 @@ var
   JSON: TJSONValue;
   Obj: TJSONObject;
 begin
-  JSON := FDriver.Commands.SendCommand('GET',
+  JSON := FDriver.Classic.Commands.SendCommand('GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/element/' + FElementId + '/rect'
   );
   try
@@ -415,7 +415,7 @@ begin
     Body.AddPair('using', By.Strategy);
     Body.AddPair('value', By.Value);
 
-    LRes := FDriver.Commands.SendCommand(
+    LRes := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/element',
       Body
@@ -463,7 +463,7 @@ begin
   try
     Body.AddPair('using', By.Strategy);
     Body.AddPair('value', By.Value);
-    LRes := FDriver.Commands.SendCommand(
+    LRes := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/elements',
       Body

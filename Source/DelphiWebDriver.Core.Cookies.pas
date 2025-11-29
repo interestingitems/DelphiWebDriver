@@ -74,7 +74,7 @@ var
   Cookie: TWebDriverCookie;
   List: TList<TWebDriverCookie>;
 begin
-  LResp := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId +
+  LResp := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId +
     '/cookie');
   try
     LArr := LResp.GetValue<TJSONArray>('value');
@@ -119,7 +119,7 @@ begin
       if Cookie.Expiry > 0 then
         LObj.AddPair('expiry', TJSONNumber.Create(Cookie.Expiry));
       LBody.AddPair('cookie', LObj);
-      FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId +
+      FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId +
         '/cookie', LBody).Free;
     except
       LObj.Free;
@@ -132,13 +132,13 @@ end;
 
 procedure TWebDriverCookies.Delete(const Name: string);
 begin
-  FDriver.Commands.SendCommand('DELETE', '/session/' + FDriver.Sessions.GetSessionId + '/cookie/'
+  FDriver.Classic.Commands.SendCommand('DELETE', '/session/' + FDriver.Sessions.GetSessionId + '/cookie/'
     + Name).Free;
 end;
 
 procedure TWebDriverCookies.DeleteAll;
 begin
-  FDriver.Commands.SendCommand('DELETE', '/session/' + FDriver.Sessions.GetSessionId +
+  FDriver.Classic.Commands.SendCommand('DELETE', '/session/' + FDriver.Sessions.GetSessionId +
     '/cookie').Free;
 end;
 

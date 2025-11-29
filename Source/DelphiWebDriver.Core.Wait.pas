@@ -54,7 +54,7 @@ begin
   while MilliSecondsBetween(Now, Start) < TimeoutMS do
   begin
     try
-      if FDriver.Navigation.GetCurrentUrl.ToLower.Contains(Text.ToLower) then
+      if FDriver.Classic.Navigation.GetCurrentUrl.ToLower.Contains(Text.ToLower) then
         Exit(True);
     except
     end;
@@ -71,7 +71,7 @@ begin
   while MilliSecondsBetween(Now, Start) < TimeoutMS do
   begin
     try
-      if SameText(FDriver.Navigation.GetCurrentUrl, Value) then
+      if SameText(FDriver.Classic.Navigation.GetCurrentUrl, Value) then
         Exit(True);
     except
     end;
@@ -88,7 +88,7 @@ begin
   while MilliSecondsBetween(Now, Start) < TimeoutMS do
   begin
     try
-      if SameText(FDriver.Navigation.GetTitle, Value) then
+      if SameText(FDriver.Classic.Navigation.GetTitle, Value) then
         Exit(True);
     except
     end;
@@ -105,7 +105,7 @@ begin
   while MilliSecondsBetween(Now, Start) < TimeoutMS do
   begin
     try
-      if FDriver.Navigation.GetTitle.ToLower.Contains(Text.ToLower) then
+      if FDriver.Classic.Navigation.GetTitle.ToLower.Contains(Text.ToLower) then
         Exit(True);
     except
     end;
@@ -123,7 +123,7 @@ begin
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
   begin
     try
-      if not FDriver.Elements.ElementExists(By) then
+      if not FDriver.Classic.Elements.ElementExists(By) then
       begin
         Result := True;
         Exit;
@@ -145,7 +145,7 @@ begin
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
   begin
     try
-      ElemTemp := FDriver.Elements.FindElement(By);
+      ElemTemp := FDriver.Classic.Elements.FindElement(By);
       if Assigned(ElemTemp) then
       begin
         Result := ElemTemp;
@@ -168,7 +168,7 @@ begin
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
   begin
     try
-      Found := FDriver.Elements.FindElements(By);
+      Found := FDriver.Classic.Elements.FindElements(By);
       if Length(Found) > 0 then
       begin
         Result := Found;
@@ -192,7 +192,7 @@ begin
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
   begin
     try
-      Elem := FDriver.Elements.FindElement(By);
+      Elem := FDriver.Classic.Elements.FindElement(By);
       if Assigned(Elem) then
       begin
         Txt := Elem.GetText;
@@ -216,7 +216,7 @@ begin
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
   begin
     try
-      Elem := FDriver.Elements.FindElement(By);
+      Elem := FDriver.Classic.Elements.FindElement(By);
       if Assigned(Elem) then
       begin
         Txt := Trim(Elem.GetText);
@@ -241,7 +241,7 @@ begin
   while MilliSecondsBetween(Now, StartTime) < TimeoutMS do
   begin
     try
-      Resp := FDriver.Document.ExecuteScript('return document.readyState;', []);
+      Resp := FDriver.Classic.Document.ExecuteScript('return document.readyState;', []);
       try
         ReadyState := '';
         if Resp is TJSONString then

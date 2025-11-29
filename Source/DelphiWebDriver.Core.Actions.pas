@@ -57,7 +57,7 @@ var
   Elem: IWebElement;
   Item: TWebDriverActionItem;
 begin
-  Elem := FDriver.Elements.FindElement(By);
+  Elem := FDriver.Classic.Elements.FindElement(By);
   if not Assigned(Elem) then
     (FDriver.Events as IWebDriverEventsInternal).
       TriggerError(Format('[TWebDriverActions.MoveToElement] : Element not found for strategy: %s, value: %s', [By.Strategy, By.Value]));
@@ -102,7 +102,7 @@ var
   Elem: IWebElement;
   Item: TWebDriverActionItem;
 begin
-  Elem := FDriver.Elements.FindElement(By);
+  Elem := FDriver.Classic.Elements.FindElement(By);
   if not Assigned(Elem) then
     (FDriver.Events as IWebDriverEventsInternal).
       TriggerError(Format('[TWebDriverActions.ContextClick] : Element not found for: %s = %s', [By.Strategy, By.Value]));
@@ -286,7 +286,7 @@ begin
     ActionsArray.Add(KeyboardAction);
     Root.AddPair('actions', ActionsArray);
 
-    FDriver.Commands.SendCommand(
+    FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/actions',
       Root

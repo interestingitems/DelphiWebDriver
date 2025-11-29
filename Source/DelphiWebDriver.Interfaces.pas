@@ -208,10 +208,8 @@ type
     procedure SelectByText(const Text: string);
   end;
 
-  IWebDriver = interface
-    ['{9A8F0C82-3B1F-4A27-A1F7-9A69F9D243F0}']
-    function Capabilities: IWebDriverCapabilities;
-    function Sessions : IWebDriverSessions;
+  IWebDriverClassic = interface
+    ['{5F9A2C3B-7D41-4E2A-9F8C-3A6C1B2E8D47}']
     function Navigation : IWebDriverNavigation;
     function Contexts : IWebDriverContexts;
     function Elements : IWebDriverElements;
@@ -223,6 +221,13 @@ type
     function Alert : IWebDriverAlert;
     function Actions : IWebDriverActions;
     function Timeouts : IWebDriverTimeouts;
+  end;
+
+  IWebDriver = interface
+    ['{9A8F0C82-3B1F-4A27-A1F7-9A69F9D243F0}']
+    function Capabilities: IWebDriverCapabilities;
+    function Sessions : IWebDriverSessions;
+    function Classic : IWebDriverClassic;
     function Events : IWebDriverEvents;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;

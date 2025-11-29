@@ -50,7 +50,7 @@ implementation
 
 procedure TWebDriverContexts.CloseWindow;
 begin
-  FDriver.Commands.SendCommand('DELETE', '/session/' + FDriver.Sessions.GetSessionId + '/window').Free;
+  FDriver.Classic.Commands.SendCommand('DELETE', '/session/' + FDriver.Sessions.GetSessionId + '/window').Free;
 end;
 
 constructor TWebDriverContexts.Create(ADriver: IWebDriver);
@@ -67,7 +67,7 @@ begin
   try
     Body.AddPair('x', X);
     Body.AddPair('y', Y);
-    FDriver.Commands.SendCommand('POST', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', Body).Free;
+    FDriver.Classic.Commands.SendCommand('POST', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', Body).Free;
   finally
     Body.Free;
   end;
@@ -83,7 +83,7 @@ begin
   try
     Body.AddPair('width', TJSONNumber.Create(Width));
     Body.AddPair('height', TJSONNumber.Create(Height));
-    R := FDriver.Commands.SendCommand(
+    R := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/window/rect',
       Body
@@ -102,7 +102,7 @@ begin
   Body := TJSONObject.Create;
   R := nil;
   try
-    R := FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/fullscreen', Body);
+    R := FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/fullscreen', Body);
   finally
     Body.Free;
     R.Free;
@@ -128,7 +128,7 @@ var
   Resp: TJSONValue;
   ValueObj: TJSONObject;
 begin
-  Resp := FDriver.Commands.SendCommand('GET', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', nil);
+  Resp := FDriver.Classic.Commands.SendCommand('GET', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', nil);
   try
     ValueObj := Resp.GetValue<TJSONObject>('value');
       if not Assigned(ValueObj) then
@@ -145,7 +145,7 @@ var
   Resp: TJSONValue;
   ValueObj: TJSONObject;
 begin
-  Resp := FDriver.Commands.SendCommand('GET', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', nil);
+  Resp := FDriver.Classic.Commands.SendCommand('GET', '/session/'+ FDriver.Sessions.GetSessionId +'/window/rect', nil);
   try
     ValueObj := Resp.GetValue<TJSONObject>('value');
       if not Assigned(ValueObj) then
@@ -161,7 +161,7 @@ function TWebDriverContexts.GetWindowHandle: string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/window');
+  JSON := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/window');
   try
     Result := JSON.GetValue<string>('value');
   finally
@@ -175,7 +175,7 @@ var
   Arr: TJSONArray;
   I: Integer;
 begin
-  JSON := FDriver.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/window/handles');
+  JSON := FDriver.Classic.Commands.SendCommand('GET', '/session/' + FDriver.Sessions.GetSessionId + '/window/handles');
   try
     Arr := JSON.GetValue<TJSONArray>('value');
 
@@ -195,7 +195,7 @@ begin
   Body := TJSONObject.Create;
   R := nil;
   try
-    R := FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/maximize', Body);
+    R := FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/maximize', Body);
   finally
     Body.Free;
     R.Free;
@@ -210,7 +210,7 @@ begin
   Body := TJSONObject.Create;
   R := nil;
   try
-    R := FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/minimize', Body);
+    R := FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/minimize', Body);
   finally
     Body.Free;
     R.Free;
@@ -227,7 +227,7 @@ begin
   try
     Body.AddPair('type', WindowType);
 
-    JSON := FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/new', Body);
+    JSON := FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/window/new', Body);
     try
       ValueObj := JSON.GetValue<TJSONObject>('value');
       if not Assigned(ValueObj) then
@@ -248,7 +248,7 @@ begin
   JSON := TJSONObject.Create;
   try
     JSON.AddPair('id', TJSONNull.Create);
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;
+    FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;
   finally
     JSON.Free;
   end;
@@ -261,7 +261,7 @@ begin
   JSON := TJSONObject.Create;
   try
     JSON.AddPair('id', TJSONString.Create(FrameName));
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;
+    FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;
   finally
     JSON.Free;
   end;
@@ -275,7 +275,7 @@ begin
   try
     JSON.AddPair('id', TJSONObject.Create.AddPair('ELEMENT', Element.ElementId)
       .AddPair('element-6066-11e4-a52e-4f735466cecf', Element.ElementId));
-    FDriver.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;;
+    FDriver.Classic.Commands.SendCommand('POST', '/session/' + FDriver.Sessions.GetSessionId + '/frame', JSON).Free;;
   finally
     JSON.Free;
   end;
@@ -301,7 +301,7 @@ begin
     JSON := TJSONObject.Create;
     try
       JSON.AddPair('name', Handle);
-      FDriver.Commands.SendCommand('POST', Endpoint, JSON).Free;
+      FDriver.Classic.Commands.SendCommand('POST', Endpoint, JSON).Free;
     finally
       JSON.Free;
     end;
@@ -311,7 +311,7 @@ begin
   JSON := TJSONObject.Create;
   try
     JSON.AddPair('handle', Handle);
-    FDriver.Commands.SendCommand('POST', Endpoint, JSON).Free;
+    FDriver.Classic.Commands.SendCommand('POST', Endpoint, JSON).Free;
   finally
     JSON.Free;
   end;
@@ -329,7 +329,7 @@ begin
   Body := TJSONObject.Create;
   try
     Body.AddPair('handle', Handles[Index]);
-    JSON := FDriver.Commands.SendCommand(
+    JSON := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/window',
       Body

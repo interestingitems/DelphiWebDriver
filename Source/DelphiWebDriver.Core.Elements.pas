@@ -76,7 +76,7 @@ begin
     Body.AddPair('using', By.Strategy);
     Body.AddPair('value', By.Value);
 
-    LRes := FDriver.Commands.SendCommand(
+    LRes := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/element',
       Body
@@ -124,7 +124,7 @@ begin
   try
     Body.AddPair('using', By.Strategy);
     Body.AddPair('value', By.Value);
-    LRes := FDriver.Commands.SendCommand(
+    LRes := FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/elements',
       Body

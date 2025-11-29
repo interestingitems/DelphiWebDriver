@@ -34,7 +34,7 @@ procedure TWebDriverAlert.Accept;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('POST',
+  JSON := FDriver.Classic.Commands.SendCommand('POST',
     '/session/' + FDriver.Sessions.GetSessionId + '/alert/accept');
   try
   finally
@@ -52,7 +52,7 @@ procedure TWebDriverAlert.Dismiss;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand('POST',
+  JSON := FDriver.Classic.Commands.SendCommand('POST',
     '/session/' + FDriver.Sessions.GetSessionId + '/alert/dismiss');
   try
   finally
@@ -64,7 +64,7 @@ function TWebDriverAlert.GetText: string;
 var
   JSON: TJSONValue;
 begin
-  JSON := FDriver.Commands.SendCommand(
+  JSON := FDriver.Classic.Commands.SendCommand(
     'GET',
     '/session/' + FDriver.Sessions.GetSessionId + '/alert/text'
   );
@@ -82,7 +82,7 @@ begin
   Body := TJSONObject.Create;
   try
     Body.AddPair('text', Text);
-    FDriver.Commands.SendCommand(
+    FDriver.Classic.Commands.SendCommand(
       'POST',
       '/session/' + FDriver.Sessions.GetSessionId + '/alert/text',
       Body

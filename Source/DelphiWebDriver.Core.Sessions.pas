@@ -59,7 +59,7 @@ end;
 procedure TWebDriverSessions.Quit;
 begin
   if FSessionId <> '' then
-    FDriver.Commands.SendCommand('DELETE', '/session/' + FSessionId).Free;
+    FDriver.Classic.Commands.SendCommand('DELETE', '/session/' + FSessionId).Free;
 end;
 
 function TWebDriverSessions.StartSession: string;
@@ -78,7 +78,7 @@ begin
       TopObj := TJSONObject.Create;
       try
         TopObj.AddPair('desiredCapabilities', CapObj.Clone as TJSONObject);
-        LRes := FDriver.Commands.SendCommand('POST', '/session', TopObj);
+        LRes := FDriver.Classic.Commands.SendCommand('POST', '/session', TopObj);
       finally
         TopObj.Free;
       end;
@@ -90,7 +90,7 @@ begin
       AlwaysMatch := TJSONObject.Create;
       AlwaysMatch.AddPair('alwaysMatch', CapObj.Clone as TJSONObject);
       TopObj.AddPair('capabilities', AlwaysMatch);
-      LRes := FDriver.Commands.SendCommand('POST', '/session', TopObj);
+      LRes := FDriver.Classic.Commands.SendCommand('POST', '/session', TopObj);
     finally
       TopObj.Free;
     end;
@@ -110,7 +110,7 @@ begin
       if FSessionId = '' then
         (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverSessions.StartSession] : SessionId not found: ' + LRes.ToString);
 
-      FWindowHandle := FDriver.Contexts.GetWindowHandle;
+      FWindowHandle := FDriver.Classic.Contexts.GetWindowHandle;
 
       FWebSocketUrl := '';
       // OPERA WebSocket URL lives at: value.webSocketUrl
