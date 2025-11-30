@@ -114,23 +114,13 @@ begin
               Driver.Capabilities.Proxy := Proxy;
               Driver.Sessions.StartSession;
 
-              Driver.Events.OnLoadStart := procedure
-                                           begin
-                                             Log('Loading Started...');
-                                           end;
-
-              Driver.Events.OnLoadComplete := procedure
-                                              begin
-                                                Log('Loading Finish!');
-                                              end;
-
               Driver.Events.OnError := procedure(const Error: string)
                                        begin
                                          Log('Error : ' + Error);
                                        end;
 
 
-              Driver.Navigation.GoToURL('https://www.google.com');
+              Driver.Classic.Navigation.GoToURL('https://www.google.com');
 
               Log('Operation Done :)');
             finally
