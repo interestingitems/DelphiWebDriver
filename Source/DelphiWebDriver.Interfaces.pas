@@ -21,21 +21,13 @@ type
 
   IWebDriverEvents = interface
     ['{8031D54C-A94B-4D97-9E0C-7F22A5AFADF6}']
-    function GetOnLoadStart: TWebDriverLoadStartEvent;
-    procedure SetOnLoadStart(const Callback: TWebDriverLoadStartEvent);
-    function GetOnLoadComplete: TWebDriverLoadCompleteEvent;
-    procedure SetOnLoadComplete(const Callback: TWebDriverLoadCompleteEvent);
     function GetOnError: TWebDriverErrorEvent;
     procedure SetOnError(const Callback: TWebDriverErrorEvent);
     property OnError: TWebDriverErrorEvent read GetOnError write SetOnError;
-    property OnLoadStart: TWebDriverLoadStartEvent read GetOnLoadStart write SetOnLoadStart;
-    property OnLoadComplete: TWebDriverLoadCompleteEvent read GetOnLoadComplete write SetOnLoadComplete;
   end;
 
   IWebDriverEventsInternal = interface
     ['{1B6041A7-711A-4E54-92BE-86CA6F9E4A3B}']
-    procedure TriggerLoadStart;
-    procedure TriggerLoadComplete;
     procedure TriggerError(const Error: string);
   end;
 
@@ -208,6 +200,16 @@ type
     procedure SelectByText(const Text: string);
   end;
 
+  IWebDriverBiDiCommands = interface
+    ['{A3F2C8B1-9D47-4B6E-92E4-7F0F3C2A8D5B}']
+    procedure SendCommand(const ACommand: TJSONObject);
+  end;
+
+  IWebDriverBiDi = interface
+    ['{3F2A9C52-7B8D-4E41-9C9F-1B0C2E6D8F4A}']
+    function Commands: IWebDriverBiDiCommands;
+  end;
+
   IWebDriverClassic = interface
     ['{5F9A2C3B-7D41-4E2A-9F8C-3A6C1B2E8D47}']
     function Navigation : IWebDriverNavigation;
@@ -228,6 +230,7 @@ type
     function Capabilities: IWebDriverCapabilities;
     function Sessions : IWebDriverSessions;
     function Classic : IWebDriverClassic;
+    function BiDi : IWebDriverBiDi;
     function Events : IWebDriverEvents;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;

@@ -14,10 +14,7 @@ uses
   System.JSON;
 
 type
-  TWebDriverLoadCompleteEvent = reference to procedure;
-  TWebDriverLoadStartEvent = reference to procedure;
   TWebDriverErrorEvent = reference to procedure(const Error: string);
-
   TWebDriverWebSocketMessageEvent = procedure(Sender: TObject; const Msg: string) of object;
   TWebDriverWebSocketBasicEvent = procedure(Sender: TObject) of object;
 

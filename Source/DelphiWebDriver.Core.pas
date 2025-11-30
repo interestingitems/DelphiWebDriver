@@ -14,6 +14,7 @@ uses
   DelphiWebDriver.Core.Capabilities,
   DelphiWebDriver.Core.Sessions,
   DelphiWebDriver.Core.Classic,
+  DelphiWebDriver.Core.BiDi,
   DelphiWebDriver.Core.Events,
   DelphiWebDriver.Types;
 
@@ -25,12 +26,14 @@ type
     FCapabilities : IWebDriverCapabilities;
     FSessions : IWebDriverSessions;
     FClassic: IWebDriverClassic;
+    FBiDi: IWebDriverBiDi;
     FEvents: IWebDriverEvents;
   public
     constructor Create(BrowserConfig: TWebDriverBrowserConfig; const ABaseUrl: string); virtual;
     function Capabilities: IWebDriverCapabilities;
     function Sessions : IWebDriverSessions;
     function Classic : IWebDriverClassic;
+    function BiDi : IWebDriverBiDi;
     function Events : IWebDriverEvents;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
@@ -44,6 +47,13 @@ begin
   inherited Create;
   FBaseUrl := ABaseUrl;
   FBrowserConfig := BrowserConfig;
+end;
+
+function TWebDriver.BiDi: IWebDriverBiDi;
+begin
+  if FBiDi = nil then
+    FBiDi := TWebDriverBiDi.Create(Self as IWebDriver);
+  Result := FBiDi;
 end;
 
 function TWebDriver.BrowserConfig: TWebDriverBrowserConfig;
