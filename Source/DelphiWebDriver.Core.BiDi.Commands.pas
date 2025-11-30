@@ -31,7 +31,7 @@ type
   public
     constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
-    procedure SendCommand(const ACommand: TJSONObject);
+    procedure SendCommand(const ACommand: string);
   end;
 
 implementation
@@ -106,7 +106,7 @@ begin
   //
 end;
 
-procedure TWebDriverBiDiCommands.SendCommand(const ACommand: TJSONObject);
+procedure TWebDriverBiDiCommands.SendCommand(const ACommand: string);
 begin
   if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then
     Connect;
@@ -114,7 +114,7 @@ begin
   if not FWebSocket.Connected then
     (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.SendCommand] : BiDi WebSocket Is Not Connected');
 
-  FWebSocket.WriteData(ACommand.ToJSON);
+  FWebSocket.WriteData(ACommand);
 end;
 
 end.
