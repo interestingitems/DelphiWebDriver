@@ -546,7 +546,6 @@ begin
     if FActive and Assigned(FConnection) and FConnection.Connected then
     begin
       FConnection.IOHandler.Write(MakeFrame(Text, $01));
-      PostMessage('Sent: ' + Text);
     end
     else
       PostError('[TWebDriverWebSocket.WriteData] : Connection Lost');
