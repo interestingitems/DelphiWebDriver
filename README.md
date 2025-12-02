@@ -31,8 +31,10 @@ More tutorials and guides will be added here soon.
 
 If you find DelphiWebDriver useful, consider supporting its development ❤️
 
-**PayPal:**  
+**Buy Me a Coffee:**  
+[![BuyMeACoffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://buymeacoffee.com/DA213)
 
+**PayPal:**  
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/ncp/payment/Q4KSUE7D7SU9N)
 
 **Bitcoin:**  
