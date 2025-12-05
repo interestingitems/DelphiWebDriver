@@ -30,13 +30,14 @@ type
     procedure OnDisconnect(Sender: TObject);
     procedure OnError(Sender: TObject; const Error: string);
     function GenerateCommandId: Integer;
-    procedure Subscribe(const EventTypes: TJSONArray); overload;
   public
     constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
     procedure SendCommand(const ACommand: string); overload;
     procedure SendCommand(const ACommand: TJSONObject); overload;
     procedure Subscribe(const EventTypes: array of string); overload;
+    procedure Subscribe(const EventTypes: TJSONArray); overload;
+    procedure Subscribe(const EventType: string; Params: TJSONObject); overload;
     procedure SubscribeToNetworkEvents;
   end;
 
@@ -125,6 +126,37 @@ begin
   (FDriver.Events as IWebDriverEventsInternal).TriggerBiDiMessage(Msg);
 end;
 
+procedure TWebDriverBiDiCommands.Subscribe(const EventType: string; Params: TJSONObject);
+var
+  Command: TJSONObject;
+  SubscriptionParams: TJSONObject;
+begin
+  Command := TJSONObject.Create;
+  try
+    Command.AddPair('method', 'session.subscribe');
+
+    SubscriptionParams := TJSONObject.Create;
+    try
+      if Assigned(Params) then
+      begin
+        SubscriptionParams := Params.Clone as TJSONObject;
+      end
+      else
+      begin
+        SubscriptionParams.AddPair('events', TJSONArray.Create.Add(EventType));
+      end;
+
+      Command.AddPair('params', SubscriptionParams);
+
+      SendCommand(Command);
+    finally
+      SubscriptionParams.Free;
+    end;
+  finally
+    Command.Free;
+  end;
+end;
+
 procedure TWebDriverBiDiCommands.Subscribe(const EventTypes: array of string);
 var
   EventsArray: TJSONArray;
@@ -145,10 +177,11 @@ procedure TWebDriverBiDiCommands.Subscribe(const EventTypes: TJSONArray);
 var
   Command: TJSONObject;
   Params: TJSONObject;
+  CommandId: Integer;
 begin
   Command := TJSONObject.Create;
   try
-    var CommandId := GenerateCommandId;
+    GenerateCommandId;
     Command.AddPair('id', TJSONNumber.Create(CommandId));
     Command.AddPair('method', 'session.subscribe');
 
