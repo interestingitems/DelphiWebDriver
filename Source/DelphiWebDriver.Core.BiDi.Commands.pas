@@ -38,6 +38,7 @@ type
     procedure Subscribe(const EventTypes: array of string); overload;
     procedure Subscribe(const EventTypes: TJSONArray); overload;
     procedure Subscribe(const EventType: string; Params: TJSONObject); overload;
+    procedure Unsubscribe(const EventType: string);
     procedure SubscribeToNetworkEvents;
   end;
 
@@ -130,9 +131,12 @@ procedure TWebDriverBiDiCommands.Subscribe(const EventType: string; Params: TJSO
 var
   Command: TJSONObject;
   SubscriptionParams: TJSONObject;
+  CommandId: Integer;
 begin
   Command := TJSONObject.Create;
   try
+    CommandId := GenerateCommandId;
+    Command.AddPair('id', TJSONNumber.Create(CommandId));
     Command.AddPair('method', 'session.subscribe');
 
     SubscriptionParams := TJSONObject.Create;
@@ -181,12 +185,33 @@ var
 begin
   Command := TJSONObject.Create;
   try
-    GenerateCommandId;
+    CommandId := GenerateCommandId;
     Command.AddPair('id', TJSONNumber.Create(CommandId));
     Command.AddPair('method', 'session.subscribe');
 
     Params := TJSONObject.Create;
     Params.AddPair('events', EventTypes.Clone as TJSONArray);
+    Command.AddPair('params', Params);
+
+    SendCommand(Command);
+  finally
+    Command.Free;
+  end;
+end;
+
+procedure TWebDriverBiDiCommands.Unsubscribe(const EventType: string);
+var
+  Command: TJSONObject;
+  Params: TJSONObject;
+  CommandId: Integer;
+begin
+  Command := TJSONObject.Create;
+  Params := TJSONObject.Create;
+  try
+    CommandId := GenerateCommandId;
+    Command.AddPair('id', TJSONNumber.Create(CommandId));
+    Command.AddPair('method', 'session.unsubscribe');
+    Params.AddPair('events', TJSONArray.Create.Add(EventType));
     Command.AddPair('params', Params);
 
     SendCommand(Command);

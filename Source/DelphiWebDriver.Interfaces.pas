@@ -211,6 +211,7 @@ type
     procedure Subscribe(const EventTypes: array of string); overload;
     procedure Subscribe(const EventTypes: TJSONArray); overload;
     procedure Subscribe(const EventType: string; Params: TJSONObject); overload;
+    procedure Unsubscribe(const EventType: string);
     procedure SubscribeToNetworkEvents;
   end;
 
