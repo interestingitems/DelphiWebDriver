@@ -4,7 +4,8 @@
 
 # DelphiWebDriver
 
-<img width="1536" height="1024" alt="ChatGPT Image Dec 5, 2025, 12_33_45 PM" src="https://github.com/user-attachments/assets/e781feeb-7718-464a-96ea-c32b74d897af" />
+<img width="1536" height="920" alt="ChatGPT Image Dec 5, 2025, 12_33_45 PM" src="https://github.com/user-attachments/assets/e781feeb-7718-464a-96ea-c32b74d897af" />
+
 
 
 A **modern and lightweight W3C WebDriver client for Delphi**, written from scratch and fully cross-platform.
