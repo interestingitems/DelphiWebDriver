@@ -15,6 +15,7 @@ uses
 
 type
   TWebDriverErrorEvent = reference to procedure(const Error: string);
+  TWebDriverBiDiMessageEvent = reference to procedure(const Msg: string);
   TWebDriverWebSocketMessageEvent = procedure(Sender: TObject; const Msg: string) of object;
   TWebDriverWebSocketBasicEvent = procedure(Sender: TObject) of object;
 

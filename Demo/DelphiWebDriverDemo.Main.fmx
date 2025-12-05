@@ -68,22 +68,13 @@ object MainForm: TMainForm
       TabOrder = 0
       Text = 'Edge'
     end
-    object HeadlessModeCheckBox: TCheckBox
-      Position.X = 456.000000000000000000
-      Position.Y = 8.000000000000000000
-      Size.Width = 113.000000000000000000
-      Size.Height = 19.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 3
-      Text = 'Headless Mode'
-    end
     object OperaRadioButton: TRadioButton
       Position.X = 272.000000000000000000
       Position.Y = 8.000000000000000000
       Size.Width = 65.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 4
+      TabOrder = 3
       Text = 'Opera'
     end
     object BraveRadioButton: TRadioButton
@@ -92,17 +83,8 @@ object MainForm: TMainForm
       Size.Width = 57.000000000000000000
       Size.Height = 19.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 5
+      TabOrder = 4
       Text = 'Brave'
-    end
-    object ProxyCheckBox: TCheckBox
-      Position.X = 592.000000000000000000
-      Position.Y = 8.000000000000000000
-      Size.Width = 97.000000000000000000
-      Size.Height = 19.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 6
-      Text = 'Enable Proxy'
     end
   end
   object LogsMemo: TMemo

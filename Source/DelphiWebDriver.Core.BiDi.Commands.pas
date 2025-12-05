@@ -27,7 +27,7 @@ type
     procedure OnMessage(Sender: TObject; const Msg: string);
     procedure OnConnect(Sender: TObject);
     procedure OnDisconnect(Sender: TObject);
-    procedure OnError(Sender: TObject; const Msg: string);
+    procedure OnError(Sender: TObject; const Error: string);
   public
     constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
@@ -96,14 +96,14 @@ begin
   //
 end;
 
-procedure TWebDriverBiDiCommands.OnError(Sender: TObject; const Msg: string);
+procedure TWebDriverBiDiCommands.OnError(Sender: TObject; const Error: string);
 begin
-  //
+  (FDriver.Events as IWebDriverEventsInternal).TriggerError(Error);
 end;
 
 procedure TWebDriverBiDiCommands.OnMessage(Sender: TObject; const Msg: string);
 begin
-  //
+  (FDriver.Events as IWebDriverEventsInternal).TriggerBiDiMessage(Msg);
 end;
 
 procedure TWebDriverBiDiCommands.SendCommand(const ACommand: string);

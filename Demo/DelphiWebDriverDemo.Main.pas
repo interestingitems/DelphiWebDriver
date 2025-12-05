@@ -29,10 +29,8 @@ type
     FirefoxRadioButton: TRadioButton;
     EdgeRadioButton: TRadioButton;
     LogsMemo: TMemo;
-    HeadlessModeCheckBox: TCheckBox;
     OperaRadioButton: TRadioButton;
     BraveRadioButton: TRadioButton;
-    ProxyCheckBox: TCheckBox;
     procedure StartDriverButtonClick(Sender: TObject);
   private
     { Private declarations }
@@ -104,25 +102,27 @@ begin
           Server.Start;
           Driver := TWebDriver.Create(BrowserConfig, 'http://localhost:9515');
             try
-              Driver.Capabilities.Headless := HeadlessModeCheckBox.IsChecked;
-              var Proxy : TWebDriverProxy;
-              Proxy.Host := '';
-              Proxy.Port := 8080;
-              Proxy.Username := '';
-              Proxy.Password := '';
-              Proxy.EnableProxy := ProxyCheckBox.IsChecked;  // Fill proxy data and set "Proxy.EnableProxy" to True if you want to enable proxy
-              Driver.Capabilities.Proxy := Proxy;
-              Driver.Sessions.StartSession;
-
               Driver.Events.OnError := procedure(const Error: string)
                                        begin
                                          Log('Error : ' + Error);
                                        end;
 
+              Driver.Events.OnBiDiMessage := procedure(const Msg: string)
+                                       begin
+                                         Log('BiDi Msg : ' + Msg);
+                                       end;
+
+              Driver.Sessions.StartSession;
+
 
               Driver.Classic.Navigation.GoToURL('https://www.google.com');
 
-              Log('Operation Done :)');
+
+              TThread.Synchronize(nil, procedure
+                begin
+                  ShowMessage('ok');
+                end);
+
             finally
               Driver.Sessions.Quit;
             end;
