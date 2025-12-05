@@ -4,6 +4,9 @@
 
 # DelphiWebDriver
 
+![Uploading ChatGPT Image Dec 5, 2025, 12_33_45 PM.png…]()
+
+
 A **modern and lightweight W3C WebDriver client for Delphi**, written from scratch and fully cross-platform.
 DelphiWebDriver provides a pure Delphi implementation of the official **W3C WebDriver protocol**, allowing you to automate browsers without Selenium, external dependencies, or .NET bindings.
 
@@ -40,7 +43,7 @@ If you find DelphiWebDriver useful, consider supporting its development ❤️
 **Bitcoin:**  
 **Address:** `14r9rqFf5rCW3HMLzT55FAzPVD6vdUDMDs`
 
-<img width="300" height="300" alt="qr" src="https://github.com/user-attachments/assets/370fa9cf-be24-4148-ba9c-8529ef4bf14a" />
+<img width="200" height="200" alt="qr" src="https://github.com/user-attachments/assets/370fa9cf-be24-4148-ba9c-8529ef4bf14a" />
 
 ---
 
