@@ -115,12 +115,15 @@ begin
               Driver.Sessions.StartSession;
 
 
+              Driver.BiDi.Commands.SubscribeToNetworkEvents;
+
+
               Driver.Classic.Navigation.GoToURL('https://www.google.com');
 
 
               TThread.Synchronize(nil, procedure
                 begin
-                  ShowMessage('ok');
+                  ShowMessage('Done :)');
                 end);
 
             finally

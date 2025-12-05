@@ -206,7 +206,10 @@ type
 
   IWebDriverBiDiCommands = interface
     ['{A3F2C8B1-9D47-4B6E-92E4-7F0F3C2A8D5B}']
-    procedure SendCommand(const ACommand: string);
+    procedure SendCommand(const ACommand: string); overload;
+    procedure SendCommand(const ACommand: TJSONObject); overload;
+    procedure Subscribe(const EventTypes: array of string); overload;
+    procedure SubscribeToNetworkEvents;
   end;
 
   IWebDriverBiDi = interface

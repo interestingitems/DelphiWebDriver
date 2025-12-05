@@ -22,16 +22,22 @@ type
     [weak]
     FDriver: IWebDriver;
     FWebSocket: TWebDriverWebSocket;
+    FCommandIdCounter: Integer;
     function Connect: Boolean;
     procedure Disconnect;
     procedure OnMessage(Sender: TObject; const Msg: string);
     procedure OnConnect(Sender: TObject);
     procedure OnDisconnect(Sender: TObject);
     procedure OnError(Sender: TObject; const Error: string);
+    function GenerateCommandId: Integer;
+    procedure Subscribe(const EventTypes: TJSONArray); overload;
   public
     constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
-    procedure SendCommand(const ACommand: string);
+    procedure SendCommand(const ACommand: string); overload;
+    procedure SendCommand(const ACommand: TJSONObject); overload;
+    procedure Subscribe(const EventTypes: array of string); overload;
+    procedure SubscribeToNetworkEvents;
   end;
 
 implementation
@@ -42,6 +48,7 @@ constructor TWebDriverBiDiCommands.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
+  FCommandIdCounter := 0;
   Connect;
 end;
 
@@ -51,10 +58,22 @@ begin
   inherited;
 end;
 
+function TWebDriverBiDiCommands.GenerateCommandId: Integer;
+begin
+  Inc(FCommandIdCounter);
+  Result := FCommandIdCounter;
+end;
+
 function TWebDriverBiDiCommands.Connect: Boolean;
 begin
   Result := False;
   try
+    if FDriver.BrowserConfig.Browser = wdbOpera then
+      begin
+        (FDriver.Events as IWebDriverEventsInternal).TriggerError('Opera BiDi Is Not Supported Yet');
+        Exit;
+      end;
+
     if Assigned(FWebSocket) and FWebSocket.Connected then
       Exit;
 
@@ -106,13 +125,88 @@ begin
   (FDriver.Events as IWebDriverEventsInternal).TriggerBiDiMessage(Msg);
 end;
 
-procedure TWebDriverBiDiCommands.SendCommand(const ACommand: string);
+procedure TWebDriverBiDiCommands.Subscribe(const EventTypes: array of string);
+var
+  EventsArray: TJSONArray;
+  I: Integer;
 begin
+  EventsArray := TJSONArray.Create;
+  try
+    for I := 0 to High(EventTypes) do
+      EventsArray.Add(EventTypes[I]);
+
+    Subscribe(EventsArray);
+  finally
+    EventsArray.Free;
+  end;
+end;
+
+procedure TWebDriverBiDiCommands.Subscribe(const EventTypes: TJSONArray);
+var
+  Command: TJSONObject;
+  Params: TJSONObject;
+begin
+  Command := TJSONObject.Create;
+  try
+    var CommandId := GenerateCommandId;
+    Command.AddPair('id', TJSONNumber.Create(CommandId));
+    Command.AddPair('method', 'session.subscribe');
+
+    Params := TJSONObject.Create;
+    Params.AddPair('events', EventTypes.Clone as TJSONArray);
+    Command.AddPair('params', Params);
+
+    SendCommand(Command);
+  finally
+    Command.Free;
+  end;
+end;
+
+procedure TWebDriverBiDiCommands.SubscribeToNetworkEvents;
+begin
+  Subscribe([
+    'network.beforeRequestSent',
+    'network.fetchError',
+    'network.responseCompleted'
+  ]);
+end;
+
+procedure TWebDriverBiDiCommands.SendCommand(const ACommand: TJSONObject);
+begin
+  if FDriver.BrowserConfig.Browser = wdbOpera then
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Opera BiDi Is Not Supported Yet');
+      Exit;
+    end;
+
   if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then
     Connect;
 
   if not FWebSocket.Connected then
-    (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.SendCommand] : BiDi WebSocket Is Not Connected');
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.SendCommand] : BiDi WebSocket Is Not Connected');
+      Exit;
+    end;
+
+  FWebSocket.WriteData(ACommand.ToJSON);
+end;
+
+procedure TWebDriverBiDiCommands.SendCommand(const ACommand: string);
+begin
+  if FDriver.BrowserConfig.Browser = wdbOpera then
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Opera BiDi Is Not Supported Yet');
+      Exit;
+    end;
+
+  if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then
+    Connect;
+
+  if not FWebSocket.Connected then
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.SendCommand] : BiDi WebSocket Is Not Connected');
+      Exit;
+    end;
 
   FWebSocket.WriteData(ACommand);
 end;
