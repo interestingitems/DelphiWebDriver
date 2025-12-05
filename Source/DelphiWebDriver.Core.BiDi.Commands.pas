@@ -40,6 +40,7 @@ type
     procedure Subscribe(const EventType: string; Params: TJSONObject); overload;
     procedure Unsubscribe(const EventType: string);
     procedure SubscribeToNetworkEvents;
+    procedure SubscribeToConsoleEvents;
   end;
 
 implementation
@@ -218,6 +219,11 @@ begin
   finally
     Command.Free;
   end;
+end;
+
+procedure TWebDriverBiDiCommands.SubscribeToConsoleEvents;
+begin
+  Subscribe(['log.entryAdded']);
 end;
 
 procedure TWebDriverBiDiCommands.SubscribeToNetworkEvents;

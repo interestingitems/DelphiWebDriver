@@ -213,6 +213,7 @@ type
     procedure Subscribe(const EventType: string; Params: TJSONObject); overload;
     procedure Unsubscribe(const EventType: string);
     procedure SubscribeToNetworkEvents;
+    procedure SubscribeToConsoleEvents;
   end;
 
   IWebDriverBiDi = interface
