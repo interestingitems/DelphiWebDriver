@@ -134,6 +134,8 @@ begin
 
               Driver.Sessions.StartSession;
 
+              // Driver.BiDi.Commands.SubscribeToNetworkEvents;
+
               Driver.BiDi.Commands.SubscribeToConsoleEvents;
 
               Driver.Classic.Navigation.GoToURL('https://www.google.com');
