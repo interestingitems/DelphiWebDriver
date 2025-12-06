@@ -132,26 +132,27 @@ begin
                                          Log('ConsoleMsg IsInternal : ' + BoolToStr(ConsoleMsg.IsInternal, True));
                                        end;
 
-              Driver.Sessions.StartSession;
+              if Driver.Sessions.StartSession then
+                begin
 
-              // Driver.BiDi.Commands.SubscribeToNetworkEvents;
+                  // Driver.BiDi.Commands.SubscribeToNetworkEvents;
 
-              Driver.BiDi.Commands.SubscribeToConsoleEvents;
+                  Driver.BiDi.Commands.SubscribeToConsoleEvents;
 
-              Driver.Classic.Navigation.GoToURL('https://www.google.com');
+                  Driver.Classic.Navigation.GoToURL('https://www.google.com');
 
-              Driver.Classic.Wait.UntilPageLoad;
+                  Driver.Classic.Wait.UntilPageLoad;
 
-              Driver.Classic.Document.ExecuteScript(
-                 'console.debug("Debug message");' +
-                 'console.info("Informational message");' +
-                 'console.log("Regular log message");' +
-                 'console.warn("Warning message");' +
-                 'console.error("Error message");'
-              );
+                  Driver.Classic.Document.ExecuteScript(
+                   'console.debug("Debug message");' +
+                   'console.info("Informational message");' +
+                   'console.log("Regular log message");' +
+                   'console.warn("Warning message");' +
+                   'console.error("Error message");'
+                  );
 
-
-              Log('Done :)');
+                  Log('Done :)');
+                end;
 
             finally
               Driver.Sessions.Quit;

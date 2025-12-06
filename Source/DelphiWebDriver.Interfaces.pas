@@ -150,7 +150,7 @@ type
 
   IWebDriverSessions = interface
     ['{9F4A6E1E-38F1-4F2E-8E13-5C71E3C4C9DA}']
-    function StartSession: string;
+    function StartSession: Boolean;
     procedure Quit;
     function GetSessionId: string;
     function GetWindowHandle: string;
