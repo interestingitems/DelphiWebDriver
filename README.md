@@ -7,9 +7,16 @@
 <img width="1536" height="920" alt="ChatGPT Image Dec 5, 2025, 12_33_45 PM" src="https://github.com/user-attachments/assets/e781feeb-7718-464a-96ea-c32b74d897af" />
 
 
+A **modern, lightweight, and fully cross-platform WebDriver + WebDriver BiDi client for Delphi**, written from scratch.
 
-A **modern and lightweight W3C WebDriver client for Delphi**, written from scratch and fully cross-platform.
-DelphiWebDriver provides a pure Delphi implementation of the official **W3C WebDriver protocol**, allowing you to automate browsers without Selenium, external dependencies, or .NET bindings.
+DelphiWebDriver provides a pure Delphi implementation of both:
+
+• The official W3C WebDriver protocol (classic HTTP automation)
+• The next-generation WebDriver BiDi protocol (real-time bidirectional browser control)
+
+No Selenium, no external dependencies, and no .NET bindings required.
+
+Automate all major browsers — Chrome, Firefox, Edge, Opera, Brave — using both traditional WebDriver commands and advanced BiDi features such as console events, network inspection, DevTools-style logging, script evaluation, and more.
 
 ---
 
