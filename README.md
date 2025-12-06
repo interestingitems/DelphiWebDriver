@@ -11,8 +11,8 @@ A **modern, lightweight, and fully cross-platform WebDriver + WebDriver BiDi cli
 
 DelphiWebDriver provides a pure Delphi implementation of both:
 
-• The official W3C WebDriver protocol (classic HTTP automation)
-• The next-generation WebDriver BiDi protocol (real-time bidirectional browser control)
+- The official W3C WebDriver protocol (classic HTTP automation)
+- The next-generation WebDriver BiDi protocol (real-time bidirectional browser control)
 
 No Selenium, no external dependencies, and no .NET bindings required.
 
