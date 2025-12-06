@@ -25,14 +25,18 @@ type
     procedure SetOnError(const Callback: TWebDriverErrorEvent);
     function GetOnBiDiMessage: TWebDriverBiDiMessageEvent;
     procedure SetOnBiDiMessage(const Callback: TWebDriverBiDiMessageEvent);
+    function GetOnBiDiConsoleMessage: TWebDriverBiDiConsoleMessageEvent;
+    procedure SetOnBiDiConsoleMessage(const Callback: TWebDriverBiDiConsoleMessageEvent);
     property OnError: TWebDriverErrorEvent read GetOnError write SetOnError;
     property OnBiDiMessage: TWebDriverBiDiMessageEvent read GetOnBiDiMessage write SetOnBiDiMessage;
+    property OnBiDiConsoleMessage: TWebDriverBiDiConsoleMessageEvent read GetOnBiDiConsoleMessage write SetOnBiDiConsoleMessage;
   end;
 
   IWebDriverEventsInternal = interface
     ['{1B6041A7-711A-4E54-92BE-86CA6F9E4A3B}']
     procedure TriggerError(const Error: string);
     procedure TriggerBidiMessage(const Msg: string);
+    procedure TriggerBidiConsoleMessage(const Msg: TWebDriverConsoleMessage);
   end;
 
   IWebDriverTimeouts = interface

@@ -14,8 +14,49 @@ uses
   System.JSON;
 
 type
+  TWebDriverConsoleLogLevel = (cllVerbose, cllDebug, cllInfo, cllLog, cllWarning, cllError, cllCritical);
+  TWebDriverConsoleLogLevelHelper = record Helper for TWebDriverConsoleLogLevel
+    class function ToConsoleLogLevel(const Str: string): TWebDriverConsoleLogLevel; static;
+    function ToString: string;
+  end;
+
+  TWebDriverConsoleMethod = (cmLog, cmDebug, cmInfo, cmWarn, cmError, cmAssert, cmTrace, cmClear, cmDir, cmDirXML,
+                             cmTable, cmGroup, cmGroupCollapsed, cmGroupEnd, cmCount, cmCountReset, cmTime, cmTimeLog,
+                             cmTimeEnd, cmTimeStamp, cmProfile, cmProfileEnd, cmMemory, cmUnknown);
+  TWebDriverConsoleMethodHelper = record Helper for TWebDriverConsoleMethod
+    class function ToConsoleMethod(const Str: string): TWebDriverConsoleMethod; static;
+    function ToString: string;
+  end;
+
+  TWebDriverLogSourceType = (lstXML, lstJavaScript, lstNetwork, lstConsoleAPI, lstStorage, lstAppCache, lstRendering,
+                             lstSecurity, lstDeprecation, lstWorker, lstViolation, lstIntervention, lstRecommendation,lstOther);
+  TWebDriverLogSourceTypeHelper = record Helper for TWebDriverLogSourceType
+    class function ToLogSourceType(const Str: string): TWebDriverLogSourceType; static;
+    function ToString: string;
+  end;
+
+  TWebDriverConsoleMessage = record
+    Text: string;
+    Level: TWebDriverConsoleLogLevel;
+    Method: TWebDriverConsoleMethod;
+    Timestamp: TDateTime;
+    SourceContext: string;
+    SourceRealm: string;
+    SourceType: string;
+    ArgumentsJSON: TJSONArray;
+    ArgumentsText: string;
+    StackTrace: string;
+    Source: TWebDriverLogSourceType;
+    LineNumber: Integer;
+    ColumnNumber: Integer;
+    URL: string;
+    WorkerId: string;
+    IsInternal: Boolean;
+  end;
+
   TWebDriverErrorEvent = reference to procedure(const Error: string);
   TWebDriverBiDiMessageEvent = reference to procedure(const Msg: string);
+  TWebDriverBiDiConsoleMessageEvent = reference to procedure(const ConsoleMessage: TWebDriverConsoleMessage);
   TWebDriverWebSocketMessageEvent = procedure(Sender: TObject; const Msg: string) of object;
   TWebDriverWebSocketBasicEvent = procedure(Sender: TObject) of object;
 
@@ -201,6 +242,183 @@ begin
     wdbEdge    : Result := 'MicrosoftEdge';
     wdbOpera   : Result := 'opera';
     wdbBrave   : Result := 'chrome';
+  end;
+end;
+
+{ TTWebDriverConsoleLogLevelHelper }
+
+class function TWebDriverConsoleLogLevelHelper.ToConsoleLogLevel(const Str: string): TWebDriverConsoleLogLevel;
+begin
+  if SameText(Str, 'verbose') then
+    Result := cllVerbose
+  else if SameText(Str, 'debug') or SameText(Str, 'debug') then
+    Result := cllDebug
+  else if SameText(Str, 'info') or SameText(Str, 'info') then
+    Result := cllInfo
+  else if SameText(Str, 'log') or SameText(Str, 'log') then
+    Result := cllLog
+  else if SameText(Str, 'warning') or SameText(Str, 'warn') then
+    Result := cllWarning
+  else if SameText(Str, 'error') or SameText(Str, 'error') then
+    Result := cllError
+  else if SameText(Str, 'critical') or SameText(Str, 'fatal') then
+    Result := cllCritical
+  else
+    Result := cllLog;
+end;
+
+function TWebDriverConsoleLogLevelHelper.ToString: string;
+begin
+  case Self of
+    cllVerbose: Result := 'verbose';
+    cllDebug: Result := 'debug';
+    cllInfo: Result := 'info';
+    cllLog: Result := 'log';
+    cllWarning: Result := 'warning';
+    cllError: Result := 'error';
+    cllCritical: Result := 'critical';
+  else
+    Result := 'log';
+  end;
+end;
+
+{ TWebDriverConsoleMethodHelper }
+
+class function TWebDriverConsoleMethodHelper.ToConsoleMethod(const Str: string): TWebDriverConsoleMethod;
+begin
+  if SameText(Str, 'log') then
+    Result := cmLog
+  else if SameText(Str, 'debug') then
+    Result := cmDebug
+  else if SameText(Str, 'info') then
+    Result := cmInfo
+  else if SameText(Str, 'warn') or SameText(Str, 'warning') then
+    Result := cmWarn
+  else if SameText(Str, 'error') then
+    Result := cmError
+  else if SameText(Str, 'assert') then
+    Result := cmAssert
+  else if SameText(Str, 'trace') then
+    Result := cmTrace
+  else if SameText(Str, 'clear') then
+    Result := cmClear
+  else if SameText(Str, 'dir') then
+    Result := cmDir
+  else if SameText(Str, 'dirxml') then
+    Result := cmDirXML
+  else if SameText(Str, 'table') then
+    Result := cmTable
+  else if SameText(Str, 'group') then
+    Result := cmGroup
+  else if SameText(Str, 'groupCollapsed') then
+    Result := cmGroupCollapsed
+  else if SameText(Str, 'groupEnd') then
+    Result := cmGroupEnd
+  else if SameText(Str, 'count') then
+    Result := cmCount
+  else if SameText(Str, 'countReset') then
+    Result := cmCountReset
+  else if SameText(Str, 'time') then
+    Result := cmTime
+  else if SameText(Str, 'timeLog') then
+    Result := cmTimeLog
+  else if SameText(Str, 'timeEnd') then
+    Result := cmTimeEnd
+  else if SameText(Str, 'timeStamp') then
+    Result := cmTimeStamp
+  else if SameText(Str, 'profile') then
+    Result := cmProfile
+  else if SameText(Str, 'profileEnd') then
+    Result := cmProfileEnd
+  else if SameText(Str, 'memory') then
+    Result := cmMemory
+  else
+    Result := cmUnknown;
+end;
+
+function TWebDriverConsoleMethodHelper.ToString: string;
+begin
+  case Self of
+    cmLog: Result := 'log';
+    cmDebug: Result := 'debug';
+    cmInfo: Result := 'info';
+    cmWarn: Result := 'warn';
+    cmError: Result := 'error';
+    cmAssert: Result := 'assert';
+    cmTrace: Result := 'trace';
+    cmClear: Result := 'clear';
+    cmDir: Result := 'dir';
+    cmDirXML: Result := 'dirxml';
+    cmTable: Result := 'table';
+    cmGroup: Result := 'group';
+    cmGroupCollapsed: Result := 'groupCollapsed';
+    cmGroupEnd: Result := 'groupEnd';
+    cmCount: Result := 'count';
+    cmCountReset: Result := 'countReset';
+    cmTime: Result := 'time';
+    cmTimeLog: Result := 'timeLog';
+    cmTimeEnd: Result := 'timeEnd';
+    cmTimeStamp: Result := 'timeStamp';
+    cmProfile: Result := 'profile';
+    cmProfileEnd: Result := 'profileEnd';
+    cmMemory: Result := 'memory';
+  else
+    Result := 'unknown';
+  end;
+end;
+
+{ TWebDriverLogSourceTypeHelper }
+
+class function TWebDriverLogSourceTypeHelper.ToLogSourceType(const Str: string): TWebDriverLogSourceType;
+begin
+  if SameText(Str, 'xml') then
+    Result := lstXML
+  else if SameText(Str, 'javascript') or SameText(Str, 'js') then
+    Result := lstJavaScript
+  else if SameText(Str, 'network') then
+    Result := lstNetwork
+  else if SameText(Str, 'console-api') or SameText(Str, 'console') then
+    Result := lstConsoleAPI
+  else if SameText(Str, 'storage') then
+    Result := lstStorage
+  else if SameText(Str, 'appcache') or SameText(Str, 'app-cache') then
+    Result := lstAppCache
+  else if SameText(Str, 'rendering') then
+    Result := lstRendering
+  else if SameText(Str, 'security') then
+    Result := lstSecurity
+  else if SameText(Str, 'deprecation') then
+    Result := lstDeprecation
+  else if SameText(Str, 'worker') then
+    Result := lstWorker
+  else if SameText(Str, 'violation') then
+    Result := lstViolation
+  else if SameText(Str, 'intervention') then
+    Result := lstIntervention
+  else if SameText(Str, 'recommendation') or SameText(Str, 'recommend') then
+    Result := lstRecommendation
+  else
+    Result := lstOther;
+end;
+
+function TWebDriverLogSourceTypeHelper.ToString: string;
+begin
+  case Self of
+    lstXML: Result := 'xml';
+    lstJavaScript: Result := 'javascript';
+    lstNetwork: Result := 'network';
+    lstConsoleAPI: Result := 'console-api';
+    lstStorage: Result := 'storage';
+    lstAppCache: Result := 'appcache';
+    lstRendering: Result := 'rendering';
+    lstSecurity: Result := 'security';
+    lstDeprecation: Result := 'deprecation';
+    lstWorker: Result := 'worker';
+    lstViolation: Result := 'violation';
+    lstIntervention: Result := 'intervention';
+    lstRecommendation: Result := 'recommendation';
+  else
+    Result := 'other';
   end;
 end;
 

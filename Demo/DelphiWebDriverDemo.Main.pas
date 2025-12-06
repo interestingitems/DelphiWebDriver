@@ -112,19 +112,44 @@ begin
                                          Log('BiDi Msg : ' + Msg);
                                        end;
 
+              Driver.Events.OnBiDiConsoleMessage := procedure(const ConsoleMsg: TWebDriverConsoleMessage)
+                                       begin
+                                         Log('============================');
+                                         Log('ConsoleMsg Text : ' + ConsoleMsg.Text);
+                                         Log('ConsoleMsg Level : ' + ConsoleMsg.Level.ToString);
+                                         Log('ConsoleMsg Method : ' + ConsoleMsg.Method.ToString);
+                                         Log('ConsoleMsg Timestamp : ' + datetimetostr(ConsoleMsg.Timestamp));
+                                         Log('ConsoleMsg SourceContext : ' + ConsoleMsg.SourceContext);
+                                         Log('ConsoleMsg SourceRealm : ' + ConsoleMsg.SourceRealm);
+                                         Log('ConsoleMsg SourceType : ' + ConsoleMsg.SourceType);
+                                         Log('ConsoleMsg ArgumentsText : ' + ConsoleMsg.ArgumentsText);
+                                         Log('ConsoleMsg StackTrace : ' + ConsoleMsg.StackTrace);
+                                         Log('ConsoleMsg Source : ' + ConsoleMsg.Source.ToString);
+                                         Log('ConsoleMsg LineNumber : ' + ConsoleMsg.LineNumber.ToString);
+                                         Log('ConsoleMsg ColumnNumber : ' + ConsoleMsg.ColumnNumber.ToString);
+                                         Log('ConsoleMsg URL : ' + ConsoleMsg.URL);
+                                         Log('ConsoleMsg WorkerId : ' + ConsoleMsg.WorkerId);
+                                         Log('ConsoleMsg IsInternal : ' + BoolToStr(ConsoleMsg.IsInternal, True));
+                                       end;
+
               Driver.Sessions.StartSession;
 
-
-              Driver.BiDi.Commands.SubscribeToNetworkEvents;
-
+              Driver.BiDi.Commands.SubscribeToConsoleEvents;
 
               Driver.Classic.Navigation.GoToURL('https://www.google.com');
 
+              Driver.Classic.Wait.UntilPageLoad;
 
-              TThread.Synchronize(nil, procedure
-                begin
-                  ShowMessage('Done :)');
-                end);
+              Driver.Classic.Document.ExecuteScript(
+                 'console.debug("Debug message");' +
+                 'console.info("Informational message");' +
+                 'console.log("Regular log message");' +
+                 'console.warn("Warning message");' +
+                 'console.error("Error message");'
+              );
+
+
+              Log('Done :)');
 
             finally
               Driver.Sessions.Quit;

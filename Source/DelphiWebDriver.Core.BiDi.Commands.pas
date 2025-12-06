@@ -12,6 +12,8 @@ interface
 uses
   System.SysUtils,
   System.JSON,
+  System.DateUtils,
+  System.Generics.Collections,
   DelphiWebDriver.Websocket,
   DelphiWebDriver.Interfaces,
   DelphiWebDriver.Types;
@@ -30,6 +32,11 @@ type
     procedure OnDisconnect(Sender: TObject);
     procedure OnError(Sender: TObject; const Error: string);
     function GenerateCommandId: Integer;
+    procedure ProcessIncomingMessage(const Msg: string);
+    function SafeGetArray(JSON: TJSONObject; const Key: string): TJSONArray;
+    function SafeGetInt64(JSON: TJSONObject; const Key: string; Default: Int64 = 0): Int64;
+    function SafeGetString(JSON: TJSONObject; const Key: string; Default: string = ''): string;
+    procedure ParseConsoleLog(const EventData: TJSONObject);
   public
     constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
@@ -126,6 +133,247 @@ end;
 procedure TWebDriverBiDiCommands.OnMessage(Sender: TObject; const Msg: string);
 begin
   (FDriver.Events as IWebDriverEventsInternal).TriggerBiDiMessage(Msg);
+  ProcessIncomingMessage(Msg);
+end;
+
+function TWebDriverBiDiCommands.SafeGetString(JSON: TJSONObject; const Key: string; Default: string = ''): string;
+var
+  Val: TJSONValue;
+begin
+  Result := Default;
+  if not Assigned(JSON) then Exit;
+
+  Val := JSON.GetValue(Key);
+  if Assigned(Val) and (Val is TJSONString) then
+    Result := TJSONString(Val).Value;
+end;
+
+function TWebDriverBiDiCommands.SafeGetInt64(JSON: TJSONObject; const Key: string; Default: Int64 = 0): Int64;
+var
+  Val: TJSONValue;
+begin
+  Result := Default;
+  if not Assigned(JSON) then Exit;
+
+  Val := JSON.GetValue(Key);
+  if Assigned(Val) and (Val is TJSONNumber) then
+    Result := TJSONNumber(Val).AsInt64;
+end;
+
+function TWebDriverBiDiCommands.SafeGetArray(JSON: TJSONObject; const Key: string): TJSONArray;
+var
+  Val: TJSONValue;
+begin
+  Result := nil;
+  if not Assigned(JSON) then Exit;
+
+  Val := JSON.GetValue(Key);
+  if Assigned(Val) and (Val is TJSONArray) then
+    Result := TJSONArray(Val);
+end;
+
+procedure TWebDriverBiDiCommands.ParseConsoleLog(const EventData: TJSONObject);
+var
+  Text, LevelStr, MethodStr, SourceContext, SourceRealm, SourceTypeStr: string;
+  Timestamp: Int64;
+  TimestampDT: TDateTime;
+  Args, CallFrames: TJSONArray;
+  SourceObj, StackTraceObj: TJSONObject;
+  i: Integer;
+  ArgsString, StackString: string;
+  ConsoleMessage: TWebDriverConsoleMessage;
+  ArgType, ArgValue, ArgInternalId, ArgHandle, ArgSharedId: string;
+  LogSourceStr, URL: string;
+  LineNumber, ColumnNumber: Integer;
+begin
+  try
+    Text := SafeGetString(EventData, 'text');
+    LevelStr := SafeGetString(EventData, 'level', 'info');
+    MethodStr := SafeGetString(EventData, 'method', 'log');
+    Timestamp := SafeGetInt64(EventData, 'timestamp', 0);
+
+    ConsoleMessage.Level := TWebDriverConsoleLogLevel.ToConsoleLogLevel(LevelStr);
+    ConsoleMessage.Method := TWebDriverConsoleMethod.ToConsoleMethod(MethodStr);
+
+    if Timestamp > 0 then
+      TimestampDT := UnixToDateTime(Timestamp div 1000, False)
+    else
+      TimestampDT := Now;
+    ConsoleMessage.Timestamp := TimestampDT;
+
+    SourceContext := '';
+    SourceRealm := '';
+    SourceTypeStr := '';
+    SourceObj := EventData.GetValue('source') as TJSONObject;
+    if Assigned(SourceObj) then
+    begin
+      SourceContext := SafeGetString(SourceObj, 'context');
+      SourceRealm := SafeGetString(SourceObj, 'realm');
+      SourceTypeStr := SafeGetString(SourceObj, 'type', 'window');
+    end;
+    ConsoleMessage.SourceContext := SourceContext;
+    ConsoleMessage.SourceRealm := SourceRealm;
+    ConsoleMessage.SourceType := SourceTypeStr;
+
+    LogSourceStr := SafeGetString(EventData, 'source');
+    ConsoleMessage.Source := TWebDriverLogSourceType.ToLogSourceType(LogSourceStr);
+
+    Args := SafeGetArray(EventData, 'args');
+    ArgsString := '';
+    if Assigned(Args) and (Args.Count > 0) then
+    begin
+      for i := 0 to Args.Count - 1 do
+      begin
+        var Arg := Args.Items[i] as TJSONObject;
+        if Assigned(Arg) then
+        begin
+          ArgType := SafeGetString(Arg, 'type');
+          ArgValue := SafeGetString(Arg, 'value');
+          ArgInternalId := SafeGetString(Arg, 'internalId');
+          ArgHandle := SafeGetString(Arg, 'handle');
+          ArgSharedId := SafeGetString(Arg, 'sharedId');
+
+          if ArgsString <> '' then
+            ArgsString := ArgsString + ', ';
+
+          if SameText(ArgType, 'string') then
+            ArgsString := ArgsString + '"' + ArgValue + '"'
+          else if SameText(ArgType, 'number') then
+            ArgsString := ArgsString + ArgValue
+          else if SameText(ArgType, 'boolean') then
+            ArgsString := ArgsString + ArgValue
+          else if SameText(ArgType, 'undefined') then
+            ArgsString := ArgsString + 'undefined'
+          else if SameText(ArgType, 'null') then
+            ArgsString := ArgsString + 'null'
+          else if SameText(ArgType, 'object') then
+          begin
+            if ArgValue <> '' then
+              ArgsString := ArgsString + ArgValue
+            else
+              ArgsString := ArgsString + 'Object';
+          end
+          else if SameText(ArgType, 'array') then
+            ArgsString := ArgsString + 'Array[' + ArgValue + ']'
+          else if SameText(ArgType, 'function') then
+            ArgsString := ArgsString + 'function ' + ArgValue + '()'
+          else
+            ArgsString := ArgsString + ArgValue;
+
+          if ArgInternalId <> '' then
+            ArgsString := ArgsString + '{internalId:' + ArgInternalId + '}';
+          if ArgHandle <> '' then
+            ArgsString := ArgsString + '{handle:' + ArgHandle + '}';
+          if ArgSharedId <> '' then
+            ArgsString := ArgsString + '{sharedId:' + ArgSharedId + '}';
+        end;
+      end;
+    end;
+
+    if (Text = '') and (ArgsString <> '') then
+      Text := ArgsString;
+    ConsoleMessage.Text := Text;
+
+    ConsoleMessage.ArgumentsJSON := Args;
+    ConsoleMessage.ArgumentsText := ArgsString;
+
+    ConsoleMessage.LineNumber := -1;
+    ConsoleMessage.ColumnNumber := -1;
+    ConsoleMessage.URL := '';
+    ConsoleMessage.WorkerId := '';
+    ConsoleMessage.IsInternal := False;
+
+    StackString := '';
+    StackTraceObj := EventData.GetValue('stackTrace') as TJSONObject;
+    if Assigned(StackTraceObj) then
+    begin
+      CallFrames := StackTraceObj.GetValue('callFrames') as TJSONArray;
+      if Assigned(CallFrames) and (CallFrames.Count > 0) then
+      begin
+        var FirstFrame := CallFrames.Items[0] as TJSONObject;
+        if Assigned(FirstFrame) then
+        begin
+          ConsoleMessage.LineNumber := SafeGetInt64(FirstFrame, 'lineNumber', 0);
+          ConsoleMessage.ColumnNumber := SafeGetInt64(FirstFrame, 'columnNumber', 0);
+          ConsoleMessage.URL := SafeGetString(FirstFrame, 'url');
+          ConsoleMessage.WorkerId := SafeGetString(FirstFrame, 'workerId');
+
+          var FunctionName := SafeGetString(FirstFrame, 'functionName', '');
+          ConsoleMessage.IsInternal := (FunctionName = '') or
+            (Pos('native', FunctionName) > 0) or
+            (Pos('anonymous', FunctionName) > 0);
+        end;
+
+        for i := 0 to CallFrames.Count - 1 do
+        begin
+          var Frame := CallFrames.Items[i] as TJSONObject;
+          if Assigned(Frame) then
+          begin
+            var FunctionName := SafeGetString(Frame, 'functionName', '(anonymous)');
+            URL := SafeGetString(Frame, 'url');
+            LineNumber := SafeGetInt64(Frame, 'lineNumber', 0) + 1;
+            ColumnNumber := SafeGetInt64(Frame, 'columnNumber', 0) + 1;
+
+            if URL <> '' then
+            begin
+              var FileName := ExtractFileName(URL);
+              StackString := StackString + sLineBreak + Format('    at %s (%s:%d:%d)',
+                [FunctionName, FileName, LineNumber, ColumnNumber]);
+            end
+            else
+            begin
+              StackString := StackString + sLineBreak + Format('    at %s (unknown source)', [FunctionName]);
+            end;
+          end;
+        end;
+      end;
+    end;
+    ConsoleMessage.StackTrace := StackString;
+
+    (FDriver.Events as IWebDriverEventsInternal).TriggerBidiConsoleMessage(ConsoleMessage);
+
+  except
+    on E: Exception do
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.ParseConsoleLog] : ' + E.Message);
+    end;
+  end;
+end;
+
+procedure TWebDriverBiDiCommands.ProcessIncomingMessage(const Msg: string);
+var
+  JSONData: TJSONObject;
+  Method, TypeStr: string;
+  Params: TJSONObject;
+begin
+  try
+    JSONData := TJSONObject.ParseJSONValue(Msg) as TJSONObject;
+    if not Assigned(JSONData) then
+      Exit;
+
+    try
+      if JSONData.TryGetValue<string>('method', Method) then
+      begin
+        if JSONData.TryGetValue<TJSONObject>('params', Params) then
+        begin
+          if Method = 'log.entryAdded' then
+            begin
+              TypeStr := SafeGetString(Params, 'type');
+              if TypeStr = 'console' then
+                ParseConsoleLog(Params);
+            end;
+        end;
+      end;
+
+    finally
+      JSONData.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.ProcessIncomingMessage] : ' + E.Message);
+    end;
+  end;
 end;
 
 procedure TWebDriverBiDiCommands.Subscribe(const EventType: string; Params: TJSONObject);
