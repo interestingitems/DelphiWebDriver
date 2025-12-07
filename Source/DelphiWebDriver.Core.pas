@@ -16,25 +16,27 @@ uses
   DelphiWebDriver.Core.Classic,
   DelphiWebDriver.Core.BiDi,
   DelphiWebDriver.Core.Events,
+  DelphiWebDriver.Core.Server,
   DelphiWebDriver.Types;
 
 type
   TWebDriver = class(TInterfacedObject, IWebDriver)
   private
-    FBaseUrl: string;
     FBrowserConfig: TWebDriverBrowserConfig;
     FCapabilities : IWebDriverCapabilities;
     FSessions : IWebDriverSessions;
     FClassic: IWebDriverClassic;
     FBiDi: IWebDriverBiDi;
     FEvents: IWebDriverEvents;
+    FServer: IWebDriverServer;
   public
-    constructor Create(BrowserConfig: TWebDriverBrowserConfig; const ABaseUrl: string); virtual;
+    constructor Create(BrowserConfig: TWebDriverBrowserConfig); virtual;
     function Capabilities: IWebDriverCapabilities;
     function Sessions : IWebDriverSessions;
     function Classic : IWebDriverClassic;
     function BiDi : IWebDriverBiDi;
     function Events : IWebDriverEvents;
+    function Server : IWebDriverServer;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
 
@@ -42,10 +44,9 @@ implementation
 
 { TWebDriver }
 
-constructor TWebDriver.Create(BrowserConfig: TWebDriverBrowserConfig; const ABaseUrl: string);
+constructor TWebDriver.Create(BrowserConfig: TWebDriverBrowserConfig);
 begin
   inherited Create;
-  FBaseUrl := ABaseUrl;
   FBrowserConfig := BrowserConfig;
 end;
 
@@ -71,7 +72,7 @@ end;
 function TWebDriver.Classic: IWebDriverClassic;
 begin
   if FClassic = nil then
-    FClassic := TWebDriverClassic.Create(Self as IWebDriver, FBaseUrl);
+    FClassic := TWebDriverClassic.Create(Self as IWebDriver);
   Result := FClassic;
 end;
 
@@ -80,6 +81,13 @@ begin
   if FEvents = nil then
     FEvents := TWebDriverEvents.Create;
   Result := FEvents;
+end;
+
+function TWebDriver.Server: IWebDriverServer;
+begin
+  if FServer = nil then
+    FServer := TWebDriverServer.Create(Self as IWebDriver);
+  Result := FServer;
 end;
 
 function TWebDriver.Sessions: IWebDriverSessions;

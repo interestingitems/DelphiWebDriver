@@ -19,6 +19,13 @@ uses
 type
   IWebElement = interface;
 
+  IWebDriverServer = interface
+    ['{B7F4A3C1-9D82-4E3A-B6B1-2F4D8C9E7A52}']
+    procedure Start(DriverExecutablePath: String = ''; Port: Integer = 9515);
+    procedure Stop;
+    function GetBaseURL: string;
+  end;
+
   IWebDriverEvents = interface
     ['{8031D54C-A94B-4D97-9E0C-7F22A5AFADF6}']
     function GetOnError: TWebDriverErrorEvent;
@@ -247,6 +254,7 @@ type
     function Classic : IWebDriverClassic;
     function BiDi : IWebDriverBiDi;
     function Events : IWebDriverEvents;
+    function Server : IWebDriverServer;
     function BrowserConfig : TWebDriverBrowserConfig;
   end;
 

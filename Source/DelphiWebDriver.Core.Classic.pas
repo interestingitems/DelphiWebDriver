@@ -42,7 +42,7 @@ type
     FActions : IWebDriverActions;
     FTimeouts: IWebDriverTimeouts;
   public
-    constructor Create(ADriver: IWebDriver; ABaseUrl : string);
+    constructor Create(ADriver: IWebDriver);
     function Navigation : IWebDriverNavigation;
     function Contexts : IWebDriverContexts;
     function Elements : IWebDriverElements;
@@ -60,11 +60,11 @@ implementation
 
 { TWebDriverClassic }
 
-constructor TWebDriverClassic.Create(ADriver: IWebDriver; ABaseUrl : string);
+constructor TWebDriverClassic.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
-  FBaseUrl := ABaseUrl;
+  FBaseUrl := FDriver.Server.GetBaseURL;
 end;
 
 function TWebDriverClassic.Timeouts: IWebDriverTimeouts;

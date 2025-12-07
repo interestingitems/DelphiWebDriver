@@ -5,12 +5,15 @@
   ------------------------------------------------------------------------------
 }
 
-unit DelphiWebDriver.Server;
+unit DelphiWebDriver.Core.Server;
 
 interface
 
 uses
-  System.SysUtils
+  DelphiWebDriver.Interfaces,
+  DelphiWebDriver.Types,
+  System.SysUtils,
+  System.IOUtils
 {$IFDEF POSIX}
   , Posix.Unistd
   , Posix.SysTypes
@@ -23,9 +26,11 @@ uses
   ;
 
 type
-  TWebDriverServer = class
+  TWebDriverServer = class(TInterfacedObject, IWebDriverServer)
   private
-    FExePath: string;
+    [weak]
+    FDriver: IWebDriver;
+    FPort: Integer;
     FStarted: Boolean;
     {$IFDEF MSWINDOWS}
     FProcessInfo: TProcessInformation;
@@ -34,21 +39,21 @@ type
     FPID: pid_t;
     {$ENDIF}
   public
-    constructor Create(const AExePath: string);
+    constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
-    procedure Start(Port: Integer = 9515);
+    procedure Start(DriverExecutablePath: string = ''; Port: Integer = 9515);
     procedure Stop;
-    property Started: Boolean read FStarted;
+    function GetBaseURL: string;
   end;
 
 implementation
 
 { TWebDriverServer }
 
-constructor TWebDriverServer.Create(const AExePath: string);
+constructor TWebDriverServer.Create(ADriver: IWebDriver);
 begin
   inherited Create;
-  FExePath := AExePath;
+  FDriver := ADriver;
   FStarted := False;
   {$IFDEF POSIX}
   FPID := 0;
@@ -61,7 +66,13 @@ begin
   inherited;
 end;
 
-procedure TWebDriverServer.Start(Port: Integer = 9515);
+function TWebDriverServer.GetBaseURL: string;
+begin
+  if FStarted then
+    Result := 'http://localhost:' + FPort.ToString;
+end;
+
+procedure TWebDriverServer.Start(DriverExecutablePath: String = ''; Port: Integer = 9515);
 {$IFDEF POSIX}
 var
   PID: pid_t;
@@ -73,10 +84,26 @@ begin
   if FStarted then
     Exit;
 
-  if not FileExists(FExePath) then
-    raise Exception.Create('WebDriver executable not found: ' + FExePath);
+  if Not DriverExecutablePath.IsEmpty then
+    begin
+      if not TFile.Exists(DriverExecutablePath) then
+        begin
+          (FDriver.Events as IWebDriverEventsInternal).TriggerError('WebDriver executable not found: ' + DriverExecutablePath);
+          Exit;
+        end;
+    end
+  else
+    begin
+      DriverExecutablePath := TPath.Combine(ExtractFilePath(ParamStr(0)), FDriver.BrowserConfig.Browser.DriverName);
+      if not TFile.Exists(DriverExecutablePath) then
+        begin
+          (FDriver.Events as IWebDriverEventsInternal).TriggerError('WebDriver executable not found: ' + DriverExecutablePath);
+          Exit;
+        end;
+    end;
 
-  Cmd := FExePath + ' --port=' + Port.ToString;
+  Cmd := DriverExecutablePath + ' --port=' + Port.ToString;
+
 
   {$IFDEF MSWINDOWS}
   var SI: TStartupInfo;
@@ -86,7 +113,10 @@ begin
 
   if not CreateProcess(nil, PChar(Cmd), nil, nil, False, CREATE_NO_WINDOW,
                       nil, nil, SI, FProcessInfo) then
-    raise Exception.Create('Cannot start driver: ' + SysErrorMessage(GetLastError));
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('Cannot start driver: ' + SysErrorMessage(GetLastError));
+      Exit;
+    end;
   {$ENDIF}
 
   {$IFDEF POSIX}
@@ -96,7 +126,10 @@ begin
 
   PID := fork;
   if PID = -1 then
-    raise Exception.Create('fork() failed');
+    begin
+      (FDriver.Events as IWebDriverEventsInternal).TriggerError('fork() failed');
+      Exit;
+    end;
 
   if PID = 0 then
   begin
@@ -108,7 +141,8 @@ begin
   {$ENDIF}
 
   FStarted := True;
-  Sleep(700);
+  FPort := Port;
+  Sleep(500);
 end;
 
 procedure TWebDriverServer.Stop;
@@ -147,6 +181,7 @@ begin
   {$ENDIF}
 
   FStarted := False;
+
 end;
 
 end.

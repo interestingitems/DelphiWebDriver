@@ -62,7 +62,7 @@ begin
 
   SetLength(Headers, 1);
   Headers[0].Name := 'Content-Type';
-  Headers[0].Value := 'application/json; charset=utf-8';
+  Headers[0].Value := 'application/json';
 
   Stream := nil;
   try
