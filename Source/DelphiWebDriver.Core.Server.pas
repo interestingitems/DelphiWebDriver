@@ -120,7 +120,7 @@ begin
   {$ENDIF}
 
   {$IFDEF POSIX}
-  ArgV[0] := PAnsiChar(AnsiString(FExePath));
+  ArgV[0] := PAnsiChar(AnsiString(DriverExecutablePath));
   ArgV[1] := PAnsiChar(AnsiString('--port=' + Port.ToString));
   ArgV[2] := nil;
 
