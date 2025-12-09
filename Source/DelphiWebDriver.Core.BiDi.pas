@@ -23,6 +23,8 @@ type
   public
     constructor Create(ADriver: IWebDriver);
     function Commands: IWebDriverBiDiCommands;
+    function Connect: Boolean;
+    procedure Disconnect;
   end;
 
 implementation
@@ -36,10 +38,20 @@ begin
   Result := FCommands;
 end;
 
+function TWebDriverBiDi.Connect: Boolean;
+begin
+  Result := (FDriver.BiDi.Commands as IWebDriverBiDiCommandsInternal).Connect;
+end;
+
 constructor TWebDriverBiDi.Create(ADriver: IWebDriver);
 begin
   inherited Create;
   FDriver := ADriver;
+end;
+
+procedure TWebDriverBiDi.Disconnect;
+begin
+  (FDriver.BiDi.Commands as IWebDriverBiDiCommandsInternal).Disconnect;
 end;
 
 end.

@@ -227,9 +227,17 @@ type
     procedure SubscribeToConsoleEvents;
   end;
 
+  IWebDriverBiDiCommandsInternal = interface
+    ['{A3F7B2C9-4D85-4F6F-9E1E-7C2C8B9F4A12}']
+    function Connect: Boolean;
+    procedure Disconnect;
+  end;
+
   IWebDriverBiDi = interface
     ['{3F2A9C52-7B8D-4E41-9C9F-1B0C2E6D8F4A}']
     function Commands: IWebDriverBiDiCommands;
+    function Connect: Boolean;
+    procedure Disconnect;
   end;
 
   IWebDriverClassic = interface

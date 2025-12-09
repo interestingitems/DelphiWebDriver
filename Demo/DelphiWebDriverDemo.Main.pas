@@ -130,28 +130,28 @@ begin
 
           if Driver.Sessions.StartSession then
             begin
-
-              // Driver.BiDi.Commands.SubscribeToNetworkEvents;
-
-              Driver.BiDi.Commands.SubscribeToConsoleEvents;
-
-              Driver.Classic.Navigation.GoToURL('https://www.google.com');
-
-              Driver.Classic.Wait.UntilPageLoad;
-
-              Driver.Classic.Document.ExecuteScript(
-                'console.debug("Debug message");' +
-                'setTimeout(() => console.info("Informational message"), 100);' +
-                'setTimeout(() => console.log("Regular log message"), 200);' +
-                'setTimeout(() => console.warn("Warning message"), 300);' +
-                'setTimeout(() => console.error("Error message"), 400);'
-              );
-
-              TThread.Synchronize(nil, procedure
+              if Driver.BiDi.Connect then
                 begin
-                  ShowMessage('Done :)');
-                end);
+                  //Driver.BiDi.Commands.SubscribeToNetworkEvents;
 
+                  Driver.BiDi.Commands.SubscribeToConsoleEvents;
+
+                  Driver.Classic.Navigation.GoToURL('https://www.google.com');
+
+                  Driver.Classic.Wait.UntilPageLoad;
+
+                  Driver.Classic.Document.ExecuteAsyncScript(
+                    'console.debug("Debug message");' +
+                    'setTimeout(() => console.info("Informational message"), 100);' +
+                    'setTimeout(() => console.log("Regular log message"), 200);' +
+                    'setTimeout(() => console.warn("Warning message"), 300);' +
+                    'setTimeout(() => console.error("Error message"), 400);'
+                  , []).Free;
+
+                  Log('Done :)');
+
+                  Driver.BiDi.Disconnect;
+                end;
             end;
 
         finally

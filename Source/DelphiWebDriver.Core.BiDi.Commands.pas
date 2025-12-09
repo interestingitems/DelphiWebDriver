@@ -19,14 +19,14 @@ uses
   DelphiWebDriver.Types;
 
 type
-  TWebDriverBiDiCommands = class(TInterfacedObject, IWebDriverBiDiCommands)
+  TWebDriverBiDiCommands = class(TInterfacedObject,
+                                 IWebDriverBiDiCommands,
+                                 IWebDriverBiDiCommandsInternal)
   private
     [weak]
     FDriver: IWebDriver;
     FWebSocket: TWebDriverWebSocket;
     FCommandIdCounter: Integer;
-    function Connect: Boolean;
-    procedure Disconnect;
     procedure OnMessage(Sender: TObject; const Msg: string);
     procedure OnConnect(Sender: TObject);
     procedure OnDisconnect(Sender: TObject);
@@ -48,6 +48,8 @@ type
     procedure Unsubscribe(const EventType: string);
     procedure SubscribeToNetworkEvents;
     procedure SubscribeToConsoleEvents;
+    function Connect: Boolean;
+    procedure Disconnect;
   end;
 
 implementation
@@ -59,7 +61,6 @@ begin
   inherited Create;
   FDriver := ADriver;
   FCommandIdCounter := 0;
-  Connect;
 end;
 
 destructor TWebDriverBiDiCommands.Destroy;
@@ -493,9 +494,6 @@ begin
     Exit;
 
   if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then
-    Connect;
-
-  if not FWebSocket.Connected then
     begin
       (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.SendCommand] : BiDi WebSocket Is Not Connected');
       Exit;
@@ -510,9 +508,6 @@ begin
     Exit;
 
   if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then
-    Connect;
-
-  if not FWebSocket.Connected then
     begin
       (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.SendCommand] : BiDi WebSocket Is Not Connected');
       Exit;
