@@ -4,7 +4,8 @@
 
 # DelphiWebDriver
 
-<img width="1536" height="920" alt="ChatGPT Image Dec 5, 2025, 12_33_45 PM" src="https://github.com/user-attachments/assets/e781feeb-7718-464a-96ea-c32b74d897af" />
+<img width="1536" height="1024" alt="logo" src="https://github.com/user-attachments/assets/3bfeb342-1afc-49b1-9196-ade23ffd81bc" />
+
 
 
 A **modern, lightweight, and fully cross-platform WebDriver + WebDriver BiDi client for Delphi**, written from scratch.
