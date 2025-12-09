@@ -16,6 +16,8 @@ uses
   System.SyncObjs,
   IdTCPClient,
   IdGlobal,
+  IdException,
+  IdStack,
   DelphiWebDriver.Types;
 
 type
@@ -33,6 +35,15 @@ type
     FKey: string;
     FWorker: TThread;
     FStopping: Boolean;
+    FLastPingTime: UInt64;
+    FPingInterval: Integer;
+    FReconnectAttempts: Integer;
+    FMaxReconnectAttempts: Integer;
+    FAutoReconnect: Boolean;
+    FIsReconnecting: Boolean;
+    FConnectionTimeout: Integer;
+    FReadTimeout: Integer;
+    FIgnoreSocketErrors: Boolean;
     procedure InitConnection;
     procedure MakeKey;
     function GetAccept(const Key: string): string;
@@ -46,9 +57,17 @@ type
     procedure PostMessage(const Text: string);
     procedure PostConnect;
     procedure PostDisconnect;
-    procedure PostError(const Text: string);
+    procedure PostError(const Text: string; IsSocketError: Boolean = False);
     function GetTicks: UInt64;
     procedure Delay(MS: Cardinal);
+    function CheckConnection: Boolean;
+    procedure SendPing;
+    procedure AttemptReconnect;
+    procedure InternalDisconnect(FromWorker: Boolean = False);
+    function IsSocketError(const ErrorMsg: string): Boolean;
+    function IsGracefulDisconnect(const ErrorMsg: string): Boolean;
+    procedure SafeWriteData(const Data: TIdBytes);
+    function SafeReadFrame(var Opcode: Byte; var Data: string): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -61,6 +80,12 @@ type
     property OnConnect: TWebDriverWebSocketBasicEvent read FOnConnect write FOnConnect;
     property OnDisconnect: TWebDriverWebSocketBasicEvent read FOnDisconnect write FOnDisconnect;
     property OnError: TWebDriverWebSocketMessageEvent read FOnError write FOnError;
+    property AutoReconnect: Boolean read FAutoReconnect write FAutoReconnect;
+    property MaxReconnectAttempts: Integer read FMaxReconnectAttempts write FMaxReconnectAttempts;
+    property PingInterval: Integer read FPingInterval write FPingInterval;
+    property ConnectionTimeout: Integer read FConnectionTimeout write FConnectionTimeout;
+    property ReadTimeout: Integer read FReadTimeout write FReadTimeout;
+    property IgnoreSocketErrors: Boolean read FIgnoreSocketErrors write FIgnoreSocketErrors;
   end;
 
 implementation
@@ -107,13 +132,25 @@ begin
   FReady := False;
   FStopping := False;
   FWorker := nil;
+  FIsReconnecting := False;
+  FAutoReconnect := True;
+  FReconnectAttempts := 0;
+  FMaxReconnectAttempts := 5;
+  FPingInterval := 30000;
+  FConnectionTimeout := 10000;
+  FReadTimeout := 5000;
+  FIgnoreSocketErrors := True;
+  FLastPingTime := 0;
   InitConnection;
 end;
 
 destructor TWebDriverWebSocket.Destroy;
 begin
   FStopping := True;
-  Disconnect;
+  FIgnoreSocketErrors := True;
+  Delay(100);
+  InternalDisconnect;
+  StopWorker;
   FLock.Free;
   FConnection.Free;
   inherited;
@@ -122,7 +159,7 @@ end;
 function TWebDriverWebSocket.GetTicks: UInt64;
 begin
   {$IFDEF MSWINDOWS}
-  Result := GetTickCount;
+  Result := GetTickCount64;
   {$ELSE}
   Result := TThread.GetTickCount;
   {$ENDIF}
@@ -136,9 +173,19 @@ end;
 procedure TWebDriverWebSocket.InitConnection;
 begin
   FConnection := TIdTCPClient.Create(nil);
-  FConnection.ReadTimeout := 1000;
-  FConnection.ConnectTimeout := 5000;
+  FConnection.ReadTimeout := FReadTimeout;
+  FConnection.ConnectTimeout := FConnectionTimeout;
   FConnection.Intercept := nil;
+  try
+    {$IFDEF HAS_IDTCPCLIENT_REUSESOCKET}
+    FConnection.ReuseSocket := rsTrue;
+    {$ENDIF}
+
+    {$IFDEF HAS_IDTCPCLIENT_USENAGLE}
+    FConnection.UseNagle := False;
+    {$ENDIF}
+  except
+  end;
 end;
 
 procedure TWebDriverWebSocket.MakeKey;
@@ -206,35 +253,43 @@ begin
   Result := False;
   Headers := TStringList.Create;
   try
-    Line := FConnection.IOHandler.ReadLn;
-    if not Line.Contains('101') then
-    begin
-      PostError('[TWebDriverWebSocket.CheckHandshake] : ' + Line);
-      Exit;
-    end;
-
-    repeat
+    try
       Line := FConnection.IOHandler.ReadLn;
-      if Line <> '' then
+      if not Line.Contains('101') then
       begin
-        ColonPos := Pos(':', Line);
-        if ColonPos > 0 then
-          Headers.Values[Trim(Copy(Line, 1, ColonPos - 1))] := Trim(Copy(Line, ColonPos + 1, MaxInt));
+        PostError('[TWebDriverWebSocket.CheckHandshake] : ' + Line);
+        Exit;
       end;
-    until Line = '';
 
-    if (Headers.Values['Upgrade'].ToLower = 'websocket') and
-       (Headers.Values['Connection'].ToLower.Contains('upgrade')) then
-    begin
-      Accept := Headers.Values['Sec-WebSocket-Accept'];
-      if Accept <> '' then
+      repeat
+        Line := FConnection.IOHandler.ReadLn;
+        if Line <> '' then
+        begin
+          ColonPos := Pos(':', Line);
+          if ColonPos > 0 then
+            Headers.Values[Trim(Copy(Line, 1, ColonPos - 1))] := Trim(Copy(Line, ColonPos + 1, MaxInt));
+        end;
+      until Line = '';
+
+      if (Headers.Values['Upgrade'].ToLower = 'websocket') and
+         (Headers.Values['Connection'].ToLower.Contains('upgrade')) then
       begin
-        Expected := GetAccept(FKey);
-        Result := Accept = Expected;
-      end
-      else
+        Accept := Headers.Values['Sec-WebSocket-Accept'];
+        if Accept <> '' then
+        begin
+          Expected := GetAccept(FKey);
+          Result := Accept = Expected;
+        end
+        else
+        begin
+          Result := True;
+        end;
+      end;
+    except
+      on E: Exception do
       begin
-        Result := True;
+        PostError('[TWebDriverWebSocket.CheckHandshake] : ' + E.Message, IsSocketError(E.Message));
+        Result := False;
       end;
     end;
   finally
@@ -313,7 +368,24 @@ begin
   Result := Frame;
 end;
 
-function TWebDriverWebSocket.ReadFrame(var Opcode: Byte; var Data: string): Boolean;
+function TWebDriverWebSocket.IsSocketError(const ErrorMsg: string): Boolean;
+begin
+  Result := (Pos('Socket Error', ErrorMsg) > 0) or
+            (Pos('EIdSocketError', ErrorMsg) > 0) or
+            (Pos('10054', ErrorMsg) > 0) or
+            (Pos('10053', ErrorMsg) > 0) or
+            (Pos('10061', ErrorMsg) > 0) or
+            (Pos('10060', ErrorMsg) > 0);
+end;
+
+function TWebDriverWebSocket.IsGracefulDisconnect(const ErrorMsg: string): Boolean;
+begin
+  Result := (Pos('Connection Closed Gracefully', ErrorMsg) > 0) or
+            (Pos('closed gracefully', LowerCase(ErrorMsg)) > 0) or
+            (Pos('EIdConnClosedGracefully', ErrorMsg) > 0);
+end;
+
+function TWebDriverWebSocket.SafeReadFrame(var Opcode: Byte; var Data: string): Boolean;
 var
   B1, B2: Byte;
   Masked: Boolean;
@@ -325,7 +397,25 @@ begin
   Result := False;
   try
     if FConnection.IOHandler.InputBufferIsEmpty then
+    begin
+      try
+        FConnection.IOHandler.CheckForDataOnSource(10);
+        if not FConnection.IOHandler.InputBufferIsEmpty then
+          Exit(False);
+
+        if not FConnection.Connected then
+          raise EIdConnClosedGracefully.Create('Connection closed');
+      except
+        on E: Exception do
+        begin
+          if IsSocketError(E.Message) then
+            Exit(False)
+          else
+            raise;
+        end;
+      end;
       Exit;
+    end;
 
     B1 := FConnection.IOHandler.ReadByte;
     B2 := FConnection.IOHandler.ReadByte;
@@ -362,7 +452,78 @@ begin
 
     Result := True;
   except
-    Data := '';
+    on E: EIdConnClosedGracefully do
+    begin
+      Data := '';
+      raise;
+    end;
+    on E: EIdSocketError do
+    begin
+      Data := '';
+      if FIgnoreSocketErrors then
+        Result := False
+      else
+        raise;
+    end;
+    on E: Exception do
+    begin
+      Data := '';
+      Result := False;
+    end;
+  end;
+end;
+
+function TWebDriverWebSocket.ReadFrame(var Opcode: Byte; var Data: string): Boolean;
+begin
+  Result := SafeReadFrame(Opcode, Data);
+end;
+
+procedure TWebDriverWebSocket.SafeWriteData(const Data: TIdBytes);
+begin
+  try
+    if CheckConnection then
+    begin
+      FConnection.IOHandler.Write(Data);
+    end;
+  except
+    on E: EIdSocketError do
+    begin
+      if not FIgnoreSocketErrors then
+        raise;
+    end;
+    on E: EIdConnClosedGracefully do
+    begin
+    end;
+    on E: Exception do
+    begin
+      if not IsSocketError(E.Message) then
+        raise;
+    end;
+  end;
+end;
+
+function TWebDriverWebSocket.CheckConnection: Boolean;
+begin
+  FLock.Enter;
+  try
+    Result := FActive and Assigned(FConnection) and
+              FConnection.Connected and not FStopping;
+  finally
+    FLock.Leave;
+  end;
+end;
+
+procedure TWebDriverWebSocket.SendPing;
+begin
+  FLock.Enter;
+  try
+    if CheckConnection then
+    begin
+      SafeWriteData(MakeFrame('', $09));
+      FLastPingTime := GetTicks;
+    end;
+  finally
+    FLock.Leave;
   end;
 end;
 
@@ -370,47 +531,103 @@ procedure TWebDriverWebSocket.WorkerLoop;
 var
   Opcode: Byte;
   Data: string;
+  CurrentTime: UInt64;
+  ConnectionClosedGracefully: Boolean;
+  SocketErrorOccurred: Boolean;
 begin
+  ConnectionClosedGracefully := False;
+  SocketErrorOccurred := False;
+  FLastPingTime := GetTicks;
+
   while FActive and not FStopping do
   begin
     try
-      if not FConnection.Connected then
-        Break;
-
-      if FConnection.IOHandler.Readable(100) then
+      if not CheckConnection then
       begin
-        if ReadFrame(Opcode, Data) then
+        ConnectionClosedGracefully := True;
+        Break;
+      end;
+
+      CurrentTime := GetTicks;
+      if (CurrentTime - FLastPingTime > FPingInterval) then
+      begin
+        SendPing;
+      end;
+
+      try
+        if FConnection.IOHandler.Readable(100) then
         begin
-          case Opcode of
-            $01:
-              PostMessage(Data);
-            $08:
-              Break;
-            $09:
-              begin
-                FLock.Enter;
-                try
-                  if FActive and FConnection.Connected and not FStopping then
-                    FConnection.IOHandler.Write(MakeFrame(Data, $0A));
-                finally
-                  FLock.Leave;
+          if ReadFrame(Opcode, Data) then
+          begin
+            case Opcode of
+              $01:
+                PostMessage(Data);
+              $08:
+                begin
+                  ConnectionClosedGracefully := True;
+                  Break;
                 end;
-              end;
-            $0A:
-              ;
-            else
+              $09:
+                begin
+                  FLock.Enter;
+                  try
+                    if CheckConnection then
+                      SafeWriteData(MakeFrame(Data, $0A));
+                  finally
+                    FLock.Leave;
+                  end;
+                end;
+              $0A:
+                begin
+                  FLastPingTime := GetTicks;
+                end;
+              else
+            end;
           end;
         end;
-      end
-      else
-      begin
-        Delay(10);
+      except
+        on E: EIdConnClosedGracefully do
+        begin
+          ConnectionClosedGracefully := True;
+          Break;
+        end;
+        on E: EIdSocketError do
+        begin
+          SocketErrorOccurred := True;
+          if not FIgnoreSocketErrors then
+            PostError('[TWebDriverWebSocket.WorkerLoop] Socket Error: ' + E.Message, True);
+          Break;
+        end;
+        on E: Exception do
+        begin
+          if not IsSocketError(E.Message) then
+            PostError('[TWebDriverWebSocket.WorkerLoop] : ' + E.Message);
+          Break;
+        end;
       end;
+
+      Delay(10);
+
     except
       on E: Exception do
       begin
         if FActive and not FStopping then
-          PostError('[TWebDriverWebSocket.WorkerLoop] : ' + E.Message);
+        begin
+          if IsGracefulDisconnect(E.Message) then
+          begin
+            ConnectionClosedGracefully := True;
+          end
+          else if IsSocketError(E.Message) then
+          begin
+            SocketErrorOccurred := True;
+            if not FIgnoreSocketErrors then
+              PostError('[TWebDriverWebSocket.WorkerLoop] : ' + E.Message, True);
+          end
+          else
+          begin
+            PostError('[TWebDriverWebSocket.WorkerLoop] : ' + E.Message);
+          end;
+        end;
         Break;
       end;
     end;
@@ -418,13 +635,54 @@ begin
 
   if FActive then
   begin
-    TThread.Queue(nil,
-      procedure
+    InternalDisconnect(True);
+    if FAutoReconnect and not FStopping then
+    begin
+      if ConnectionClosedGracefully or
+         (SocketErrorOccurred and not FIgnoreSocketErrors) then
       begin
-        if not FStopping then
-          Disconnect;
-      end);
+        AttemptReconnect;
+      end;
+    end;
   end;
+end;
+
+procedure TWebDriverWebSocket.AttemptReconnect;
+begin
+  if FIsReconnecting or FStopping then
+    Exit;
+
+  FIsReconnecting := True;
+
+  TThread.Queue(nil,
+    procedure
+    begin
+      if FStopping then
+        Exit;
+
+      if FReconnectAttempts < FMaxReconnectAttempts then
+      begin
+        Inc(FReconnectAttempts);
+        try
+          Delay(1000 * FReconnectAttempts + Random(500));
+          Connect;
+        except
+          on E: Exception do
+          begin
+            if not IsSocketError(E.Message) or not FIgnoreSocketErrors then
+              PostError('[TWebDriverWebSocket.AttemptReconnect] : ' + E.Message);
+
+            if FReconnectAttempts < FMaxReconnectAttempts then
+              AttemptReconnect;
+          end;
+        end;
+      end
+      else
+      begin
+        PostError('[TWebDriverWebSocket] : Max reconnection attempts reached');
+      end;
+      FIsReconnecting := False;
+    end);
 end;
 
 procedure TWebDriverWebSocket.StopWorker;
@@ -442,7 +700,7 @@ begin
     if not FWorker.Finished then
     begin
       FWorker.Terminate;
-      Delay(100);
+      FWorker.WaitFor;
     end;
 
     FreeAndNil(FWorker);
@@ -452,60 +710,16 @@ end;
 procedure TWebDriverWebSocket.CloseConnection;
 begin
   try
-    if Assigned(FConnection) and FConnection.Connected then
-      FConnection.Disconnect;
+    if Assigned(FConnection) then
+    begin
+      if FConnection.Connected then
+        FConnection.Disconnect(False);
+    end;
   except
   end;
 end;
 
-procedure TWebDriverWebSocket.Connect;
-var
-  URI: TIdURI;
-  Port: Integer;
-begin
-  if FActive then
-  begin
-    Exit;
-  end;
-
-  if FStopping then
-  begin
-    Exit;
-  end;
-
-  URI := TIdURI.Create(FHost);
-  try
-    FConnection.Host := URI.Host;
-
-    if URI.Port <> '' then
-      Port := StrToIntDef(URI.Port, 80)
-    else
-      Port := 80;
-
-    FConnection.Port := Port;
-    FConnection.Connect;
-    DoHandshake;
-
-    if not CheckHandshake then
-    begin
-      CloseConnection;
-      PostError('[TWebDriverWebSocket.CheckHandshake] : Handshake Failed');
-    end;
-
-    FActive := True;
-    FReady := True;
-
-    StopWorker;
-    FWorker := TWebSocketWorker.Create(Self);
-
-    PostConnect;
-
-  finally
-    URI.Free;
-  end;
-end;
-
-procedure TWebDriverWebSocket.Disconnect;
+procedure TWebDriverWebSocket.InternalDisconnect(FromWorker: Boolean = False);
 begin
   if not FActive and not FReady then
     Exit;
@@ -514,13 +728,13 @@ begin
   FReady := False;
 
   try
-    if FReady then
+    if not FromWorker then
     begin
       FLock.Enter;
       try
         if Assigned(FConnection) and FConnection.Connected then
         begin
-          FConnection.IOHandler.Write(MakeFrame('', $08));
+          SafeWriteData(MakeFrame('', $08));
           Delay(50);
         end;
       finally
@@ -530,22 +744,100 @@ begin
   except
   end;
 
-  StopWorker;
+  if not FromWorker then
+  begin
+    StopWorker;
+  end;
+
   CloseConnection;
 
   PostDisconnect;
 end;
 
+procedure TWebDriverWebSocket.Connect;
+var
+  URI: TIdURI;
+  Port: Integer;
+begin
+  if FActive then
+    Exit;
+
+  if FStopping then
+    Exit;
+
+  if FIsReconnecting then
+    Exit;
+
+  try
+    URI := TIdURI.Create(FHost);
+    try
+      FConnection.Host := URI.Host;
+
+      if URI.Port <> '' then
+        Port := StrToIntDef(URI.Port, 80)
+      else
+        Port := 80;
+
+      FConnection.Port := Port;
+
+      FConnection.ReadTimeout := FReadTimeout;
+      FConnection.ConnectTimeout := FConnectionTimeout;
+
+      FConnection.Connect;
+      DoHandshake;
+
+      if not CheckHandshake then
+      begin
+        CloseConnection;
+        PostError('[TWebDriverWebSocket.CheckHandshake] : Handshake Failed');
+        Exit;
+      end;
+
+      FActive := True;
+      FReady := True;
+      FReconnectAttempts := 0;
+
+      StopWorker;
+      FWorker := TWebSocketWorker.Create(Self);
+
+      PostConnect;
+
+    finally
+      URI.Free;
+    end;
+  except
+    on E: EIdSocketError do
+    begin
+      if not FIgnoreSocketErrors then
+        PostError('[TWebDriverWebSocket.Connect] Socket Error: ' + E.Message, True);
+      raise;
+    end;
+    on E: Exception do
+    begin
+      PostError('[TWebDriverWebSocket.Connect] : ' + E.Message);
+      raise;
+    end;
+  end;
+end;
+
+procedure TWebDriverWebSocket.Disconnect;
+begin
+  InternalDisconnect;
+end;
+
 procedure TWebDriverWebSocket.WriteData(const Text: string);
 begin
-  if not FActive or not FReady or FStopping then
+  if not CheckConnection then
+  begin
     PostError('[TWebDriverWebSocket.WriteData] : Websocket Not Connected');
+    Exit;
+  end;
 
   FLock.Enter;
   try
-    if FActive and Assigned(FConnection) and FConnection.Connected then
+    if CheckConnection then
     begin
-      FConnection.IOHandler.Write(MakeFrame(Text, $01));
+      SafeWriteData(MakeFrame(Text, $01));
     end
     else
       PostError('[TWebDriverWebSocket.WriteData] : Connection Lost');
@@ -587,8 +879,11 @@ begin
       end);
 end;
 
-procedure TWebDriverWebSocket.PostError(const Text: string);
+procedure TWebDriverWebSocket.PostError(const Text: string; IsSocketError: Boolean = False);
 begin
+  if IsSocketError and FIgnoreSocketErrors then
+    Exit;
+
   if Assigned(FOnError) and not FStopping then
     TThread.Queue(nil,
       procedure

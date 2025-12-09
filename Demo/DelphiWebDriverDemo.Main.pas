@@ -141,16 +141,17 @@ begin
 
               Driver.Classic.Document.ExecuteScript(
                 'console.debug("Debug message");' +
-                'console.info("Informational message");' +
-                'console.log("Regular log message");' +
-                'console.warn("Warning message");' +
-                'console.error("Error message");'
+                'setTimeout(() => console.info("Informational message"), 100);' +
+                'setTimeout(() => console.log("Regular log message"), 200);' +
+                'setTimeout(() => console.warn("Warning message"), 300);' +
+                'setTimeout(() => console.error("Error message"), 400);'
               );
 
               TThread.Synchronize(nil, procedure
                 begin
                   ShowMessage('Done :)');
                 end);
+
             end;
 
         finally

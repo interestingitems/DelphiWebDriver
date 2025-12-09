@@ -91,6 +91,10 @@ begin
       (FDriver.Events as IWebDriverEventsInternal).TriggerError('[TWebDriverBiDiCommands.Connect] : No Active WebDriver Session Found For BiDi Connection');
 
     FWebSocket := TWebDriverWebSocket.Create;
+    FWebSocket.AutoReconnect := True;
+    FWebSocket.MaxReconnectAttempts := 10;
+    FWebSocket.PingInterval := 15000;
+    FWebSocket.IgnoreSocketErrors := True;
     FWebSocket.OnMessage := OnMessage;
     FWebSocket.OnConnect := OnConnect;
     FWebSocket.OnDisconnect := OnDisconnect;
