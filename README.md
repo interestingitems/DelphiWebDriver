@@ -13,6 +13,9 @@ Join the DelphiWebDriver community to get help, share ideas, report issues, and 
 **Telegram Group:**  
 👉 https://t.me/DelphiWebDriver
 
+**YouTube Channel:**  
+👉 https://youtube.com/@ABDERRAHMANE2030
+
 ---
 
 <img width="1536" height="1024" alt="logo" src="https://github.com/user-attachments/assets/3bfeb342-1afc-49b1-9196-ade23ffd81bc" />
@@ -74,4 +77,4 @@ If you find DelphiWebDriver useful, consider supporting its development ❤️
 * Pure Delphi implementation: no external dependencies  
 * Automates all major browsers: Chrome, Firefox, Edge, Opera, Brave  
 * Low-level command access & high-level convenience API  
-* Lightweight, modern, and easy to integrate  
+* Lightweight, modern, and easy to integrate
