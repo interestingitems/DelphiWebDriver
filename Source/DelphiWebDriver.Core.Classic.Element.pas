@@ -120,7 +120,7 @@ var
 begin
   Body := TJSONObject.Create;
   try
-    if FDriver.BrowserConfig.Browser = wdbOpera then
+    if FDriver.Config.Browser = wdbOpera then
       Body.AddPair('id', FElementId);
 
     FDriver.Classic.Commands.SendCommand(
@@ -193,7 +193,7 @@ begin
 
   JsonWireBody.AddPair('value', ValArray);
   try
-    if FDriver.BrowserConfig.Browser = wdbOpera then
+    if FDriver.Config.Browser = wdbOpera then
     begin
       FDriver.Classic.Commands.SendCommand(
         'POST',

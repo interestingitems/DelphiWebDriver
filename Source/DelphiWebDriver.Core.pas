@@ -22,7 +22,7 @@ uses
 type
   TWebDriver = class(TInterfacedObject, IWebDriver)
   private
-    FBrowserConfig: TWebDriverBrowserConfig;
+    FConfig: TWebDriverConfig;
     FCapabilities : IWebDriverCapabilities;
     FSessions : IWebDriverSessions;
     FClassic: IWebDriverClassic;
@@ -30,24 +30,24 @@ type
     FEvents: IWebDriverEvents;
     FServer: IWebDriverServer;
   public
-    constructor Create(BrowserConfig: TWebDriverBrowserConfig); virtual;
+    constructor Create(Config: TWebDriverConfig); virtual;
     function Capabilities: IWebDriverCapabilities;
     function Sessions : IWebDriverSessions;
     function Classic : IWebDriverClassic;
     function BiDi : IWebDriverBiDi;
     function Events : IWebDriverEvents;
     function Server : IWebDriverServer;
-    function BrowserConfig : TWebDriverBrowserConfig;
+    function Config : TWebDriverConfig;
   end;
 
 implementation
 
 { TWebDriver }
 
-constructor TWebDriver.Create(BrowserConfig: TWebDriverBrowserConfig);
+constructor TWebDriver.Create(Config: TWebDriverConfig);
 begin
   inherited Create;
-  FBrowserConfig := BrowserConfig;
+  FConfig := Config;
 end;
 
 function TWebDriver.BiDi: IWebDriverBiDi;
@@ -57,9 +57,9 @@ begin
   Result := FBiDi;
 end;
 
-function TWebDriver.BrowserConfig: TWebDriverBrowserConfig;
+function TWebDriver.Config: TWebDriverConfig;
 begin
-  Result := FBrowserConfig;
+  Result := FConfig;
 end;
 
 function TWebDriver.Capabilities: IWebDriverCapabilities;

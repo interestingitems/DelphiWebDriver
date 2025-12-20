@@ -79,7 +79,7 @@ function TWebDriverBiDiCommands.Connect: Boolean;
 begin
   Result := False;
   try
-    if FDriver.BrowserConfig.Browser = wdbOpera then
+    if FDriver.Config.Browser = wdbOpera then
       begin
         (FDriver.Events as IWebDriverEventsInternal).TriggerError('Opera BiDi Is Not Supported Yet');
         Exit;
@@ -490,7 +490,7 @@ end;
 
 procedure TWebDriverBiDiCommands.SendCommand(const ACommand: TJSONObject);
 begin
-  if FDriver.BrowserConfig.Browser = wdbOpera then
+  if FDriver.Config.Browser = wdbOpera then
     Exit;
 
   if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then
@@ -504,7 +504,7 @@ end;
 
 procedure TWebDriverBiDiCommands.SendCommand(const ACommand: string);
 begin
-  if FDriver.BrowserConfig.Browser = wdbOpera then
+  if FDriver.Config.Browser = wdbOpera then
     Exit;
 
   if (not Assigned(FWebSocket)) or (not FWebSocket.Connected) then

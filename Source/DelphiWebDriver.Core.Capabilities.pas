@@ -166,7 +166,7 @@ begin
 
   if FHeadless then
   begin
-    case FDriver.BrowserConfig.Browser of
+    case FDriver.Config.Browser of
       wdbChrome,
       wdbEdge,
       wdbOpera,
@@ -179,7 +179,7 @@ begin
 
   if FProxy.EnableProxy then
     begin
-      case FDriver.BrowserConfig.Browser of
+      case FDriver.Config.Browser of
         wdbChrome, wdbEdge, wdbOpera, wdbBrave:
           begin
             var ExtensionDir := CreateChromiumProxyExtensionMV2(FProxy.Host, FProxy.Username, FProxy.Password, FProxy.Port);
@@ -206,14 +206,14 @@ begin
 
   OptionsObj.AddPair('args', ArgsArray);
 
-  if FDriver.BrowserConfig.BinaryPath <> '' then
-    OptionsObj.AddPair('binary', FDriver.BrowserConfig.BinaryPath);
+  if FDriver.Config.BrowserPath <> '' then
+    OptionsObj.AddPair('binary', FDriver.Config.BrowserPath);
 
   CapObj := TJSONObject.Create;
-  CapObj.AddPair('browserName', FDriver.BrowserConfig.Browser.Name);
+  CapObj.AddPair('browserName', FDriver.Config.Browser.Name);
   CapObj.AddPair('webSocketUrl', TJSONBool.Create(True));
 
-  case FDriver.BrowserConfig.Browser of
+  case FDriver.Config.Browser of
     wdbChrome, wdbBrave:
       CapObj.AddPair('goog:chromeOptions', OptionsObj);
 
@@ -226,10 +226,10 @@ begin
     wdbOpera:
     begin
       CapObj.AddPair('goog:chromeOptions', OptionsObj);
-      if FDriver.BrowserConfig.BinaryPath <> '' then
+      if FDriver.Config.BrowserPath <> '' then
       begin
         OperaOpts := TJSONObject.Create;
-        OperaOpts.AddPair('binary', FDriver.BrowserConfig.BinaryPath);
+        OperaOpts.AddPair('binary', FDriver.Config.BrowserPath);
         CapObj.AddPair('operaOptions', OperaOpts);
       end;
     end;

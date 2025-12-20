@@ -295,7 +295,7 @@ var
   Endpoint: string;
 begin
   SessionId := FDriver.Sessions.GetSessionId;
-  if FDriver.BrowserConfig.Browser = wdbOpera then
+  if FDriver.Config.Browser = wdbOpera then
   begin
     Endpoint := '/session/' + SessionId + '/window';
     JSON := TJSONObject.Create;

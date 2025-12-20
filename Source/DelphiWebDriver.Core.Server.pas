@@ -41,7 +41,7 @@ type
   public
     constructor Create(ADriver: IWebDriver);
     destructor Destroy; override;
-    procedure Start(DriverExecutablePath: string = ''; Port: Integer = 9515);
+    procedure Start;
     procedure Stop;
     function GetBaseURL: string;
   end;
@@ -72,29 +72,31 @@ begin
     Result := 'http://localhost:' + FPort.ToString;
 end;
 
-procedure TWebDriverServer.Start(DriverExecutablePath: String = ''; Port: Integer = 9515);
+procedure TWebDriverServer.Start;
 {$IFDEF POSIX}
 var
   PID: pid_t;
   ArgV: array[0..2] of PAnsiChar;
 {$ENDIF}
 var
-  Cmd: string;
+  Cmd, DriverExecutablePath: string;
 begin
   if FStarted then
     Exit;
 
-  if Not DriverExecutablePath.IsEmpty then
+  if Not FDriver.Config.DriverPath.IsEmpty then
     begin
-      if not TFile.Exists(DriverExecutablePath) then
+      if not TFile.Exists(FDriver.Config.DriverPath) then
         begin
-          (FDriver.Events as IWebDriverEventsInternal).TriggerError('WebDriver executable not found: ' + DriverExecutablePath);
+          (FDriver.Events as IWebDriverEventsInternal).TriggerError('WebDriver executable not found: ' + FDriver.Config.DriverPath);
           Exit;
-        end;
+        end
+      else
+        DriverExecutablePath := FDriver.Config.DriverPath;
     end
   else
     begin
-      DriverExecutablePath := TPath.Combine(ExtractFilePath(ParamStr(0)), FDriver.BrowserConfig.Browser.DriverName);
+      DriverExecutablePath := TPath.Combine(ExtractFilePath(ParamStr(0)), FDriver.Config.Browser.DriverName);
       if not TFile.Exists(DriverExecutablePath) then
         begin
           (FDriver.Events as IWebDriverEventsInternal).TriggerError('WebDriver executable not found: ' + DriverExecutablePath);
@@ -102,8 +104,7 @@ begin
         end;
     end;
 
-  Cmd := DriverExecutablePath + ' --port=' + Port.ToString;
-
+  Cmd := DriverExecutablePath + ' --port=' + FDriver.Config.ServerPort.ToString;
 
   {$IFDEF MSWINDOWS}
   var SI: TStartupInfo;
@@ -141,7 +142,7 @@ begin
   {$ENDIF}
 
   FStarted := True;
-  FPort := Port;
+  FPort := FDriver.Config.ServerPort;
   Sleep(500);
 end;
 

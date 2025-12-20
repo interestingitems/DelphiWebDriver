@@ -91,9 +91,11 @@ type
     function DriverName : String;
   end;
 
-  TWebDriverBrowserConfig = record
+  TWebDriverConfig = record
     Browser: TWebDriverBrowser;
-    BinaryPath: string;
+    DriverPath: string;
+    BrowserPath: string;
+    ServerPort: Integer;
   end;
 
   TWebDriverCookie = record

@@ -154,7 +154,7 @@ var
   begin
     O := TJSONObject.Create;
     O.AddPair('element-6066-11e4-a52e-4f735466cecf', ElementId);
-    if FDriver.BrowserConfig.Browser = wdbOpera then
+    if FDriver.Config.Browser = wdbOpera then
       O.AddPair('ELEMENT', ElementId);
     AObj.AddPair('origin', O);
   end;

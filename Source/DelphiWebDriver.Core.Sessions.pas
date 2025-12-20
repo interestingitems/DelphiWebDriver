@@ -82,7 +82,7 @@ begin
   CapObj := FDriver.Capabilities.ToJSON;
   try
     try
-      if FDriver.BrowserConfig.Browser = wdbOpera then
+      if FDriver.Config.Browser = wdbOpera then
       begin
         TopObj := TJSONObject.Create;
         try
@@ -163,7 +163,7 @@ begin
 
         FWebSocketUrl := '';
 
-        if FDriver.BrowserConfig.Browser = wdbOpera then
+        if FDriver.Config.Browser = wdbOpera then
         begin
           if Assigned(LValue) and (LValue is TJSONObject) then
             LSessionObj.TryGetValue<string>('webSocketUrl', FWebSocketUrl);

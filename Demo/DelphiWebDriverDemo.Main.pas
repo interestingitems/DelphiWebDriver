@@ -61,30 +61,41 @@ end;
 
 procedure TMainForm.StartDriverButtonClick(Sender: TObject);
 var
-  BrowserConfig : TWebDriverBrowserConfig;
+  Config : TWebDriverConfig;
 begin
   if ChromeRadioButton.IsChecked then
-    BrowserConfig.Browser := wdbChrome;
+    begin
+      Config.Browser := wdbChrome;
+      Config.ServerPort := 1111;
+    end;
 
   if FirefoxRadioButton.IsChecked then
-    BrowserConfig.Browser := wdbFirefox;
+    begin
+      Config.Browser := wdbFirefox;
+      Config.ServerPort := 2222;
+    end;
 
   if EdgeRadioButton.IsChecked then
-    BrowserConfig.Browser := wdbEdge;
+    begin
+      Config.Browser := wdbEdge;
+      Config.ServerPort := 3333;
+    end;
 
   if OperaRadioButton.IsChecked then
     begin
-      BrowserConfig.Browser := wdbOpera;
-      BrowserConfig.BinaryPath := 'C:\Users\<YOUR USERNAME>\AppData\Local\Programs\Opera\opera.exe';
+      Config.Browser := wdbOpera;
+      Config.BrowserPath := 'C:\Users\<YOUR USERNAME>\AppData\Local\Programs\Opera\opera.exe';
+      Config.ServerPort := 4444;
     end;
 
   if BraveRadioButton.IsChecked then
     begin
-      BrowserConfig.Browser := wdbBrave;
-      BrowserConfig.BinaryPath := 'C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe';
+      Config.Browser := wdbBrave;
+      Config.BrowserPath := 'C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe';
+      Config.ServerPort := 5555;
     end;
 
-  if BrowserConfig.Browser = wdbUnknown then
+  if Config.Browser = wdbUnknown then
     begin
       LogsMemo.Text := 'You must select a driver';
       Exit;
@@ -94,7 +105,7 @@ begin
     var
       Driver: IWebDriver;
     begin
-      Driver := TWebDriver.Create(BrowserConfig);
+      Driver := TWebDriver.Create(Config);
         try
           Driver.Server.Start;
 

@@ -21,7 +21,7 @@ type
 
   IWebDriverServer = interface
     ['{B7F4A3C1-9D82-4E3A-B6B1-2F4D8C9E7A52}']
-    procedure Start(DriverExecutablePath: String = ''; Port: Integer = 9515);
+    procedure Start;
     procedure Stop;
     function GetBaseURL: string;
   end;
@@ -263,7 +263,7 @@ type
     function BiDi : IWebDriverBiDi;
     function Events : IWebDriverEvents;
     function Server : IWebDriverServer;
-    function BrowserConfig : TWebDriverBrowserConfig;
+    function Config : TWebDriverConfig;
   end;
 
 implementation
