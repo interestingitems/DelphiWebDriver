@@ -1,7 +1,7 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
-  Caption = 'Delphi WebDriver Demo'
+  Caption = 'DelphiWebDriver Navigation Demo'
   ClientHeight = 485
   ClientWidth = 710
   Position = DesktopCenter

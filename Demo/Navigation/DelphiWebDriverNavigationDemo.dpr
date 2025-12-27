@@ -1,9 +1,9 @@
-program DelphiWebDriverDemo;
+program DelphiWebDriverNavigationDemo;
 
 uses
   System.StartUpCopy,
   FMX.Forms,
-  DelphiWebDriverDemo.Main in 'DelphiWebDriverDemo.Main.pas' {MainForm};
+  DelphiWebDriverNavigationDemo.Main in 'DelphiWebDriverNavigationDemo.Main.pas' {MainForm};
 
 {$R *.res}
 
